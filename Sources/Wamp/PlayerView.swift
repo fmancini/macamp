@@ -29,8 +29,6 @@ struct PlayerView: View {
         }
         .onAppear { player.undoManager = undoManager }
         .task {
-            SeedData.insertIfRequested(player: player)
-            SelfTest.runIfRequested(player: player)
             Snapshot.runIfRequested(model: model, player: player, openSettings: openSettings, openWindow: openWindow)
         }
         .accessibilityLabel("Audio files drop area")

@@ -14,7 +14,7 @@ import SwiftUI
 struct WampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var model = AppModel()
-    @State private var player = Player()
+    @State private var player = Player.shared
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
@@ -103,6 +103,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Started from a terminal, the process is not a foreground app yet.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        // Test modes start here, so they do not depend on a window being on screen.
+        Task { @MainActor in
+            SeedData.insertIfRequested(player: Player.shared)
+            SelfTest.runIfRequested(player: Player.shared)
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }

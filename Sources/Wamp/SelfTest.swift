@@ -35,6 +35,13 @@ enum SelfTest {
             let bad = dir.appending(path: "broken.mp3")
             try? Data("not audio".utf8).write(to: bad)
 
+            // Real audio must flow: a system sound, measured at the player node.
+            player.open([URL(fileURLWithPath: "/System/Library/Sounds/Hero.aiff")])
+            try? await Task.sleep(for: .seconds(0.5))
+            let peak = player.takePeak()
+            check("samples reach the output (not silence)", peak > 0.01, "peak \(peak)")
+            player.clearQueue()
+
             // S-001 open files and play
             player.open([a, b, c])
             check("Open Files adds three tracks to the Queue", player.queue.tracks.count == 3)

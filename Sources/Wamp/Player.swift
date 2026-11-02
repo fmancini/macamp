@@ -8,6 +8,9 @@ import WampKit
 /// scheduled before the current one ends, so same-format tracks play gapless.
 @Observable
 final class Player {
+    /// The one player. The app, the menus, and test modes all use it.
+    static let shared = Player()
+
     private(set) var queue = QueueState() {
         didSet { queueChanged(from: oldValue) }
     }
@@ -48,7 +51,56 @@ final class Player {
             queue = restored
             unavailable = Set(restored.tracks.filter { !FileManager.default.fileExists(atPath: $0.path) }.map(\.id))
         }
+        // Samples leaving the player node, before the volume. Self-test reads it.
+        Self.installPeakTap(on: node, store: peakStore)
+        // A device change (a display with speakers, headphones, Bluetooth) stops the
+        // engine. Without this, the window says "playing" and nothing sounds.
+        NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine,
+                                               queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.engineConfigurationChanged() }
+        }
         setUpRemoteCommands()
+    }
+
+    /// Largest sample seen since the last read, then resets. Self-test only.
+    func takePeak() -> Float {
+        let value = peakStore.value
+        peakStore.value = 0
+        return value
+    }
+    private let peakStore = PeakStore()
+
+    /// Runs on the audio thread, so it must not be main-actor code.
+    private nonisolated static func installPeakTap(on node: AVAudioPlayerNode, store: PeakStore) {
+        node.installTap(onBus: 0, bufferSize: 1024, format: nil) { buffer, _ in
+            guard let data = buffer.floatChannelData?[0] else { return }
+            var peak: Float = 0
+            for i in 0..<Int(buffer.frameLength) { peak = max(peak, abs(data[i])) }
+            store.value = max(peak, store.value)
+        }
+    }
+
+    private func engineConfigurationChanged() {
+        guard file != nil else { return }
+        let position = isPlaying ? elapsed : pausedAt
+        let wasPlaying = isPlaying
+        connectedFormat = nil
+        stopEngine()
+        isPlaying = wasPlaying
+        seekAfterRestart(to: position, playing: wasPlaying)
+    }
+
+    private func seekAfterRestart(to seconds: Double, playing: Bool) {
+        guard let file else { return }
+        connect(format: file.processingFormat)
+        startEngineIfNeeded()
+        let rate = file.processingFormat.sampleRate
+        startFrame = min(AVAudioFramePosition(seconds * rate), max(0, file.length - 1))
+        baseSample = 0
+        scheduleCurrent(from: startFrame)
+        if playing { node.play(); scheduleNext() } else { pausedAt = Double(startFrame) / rate }
+        isPlaying = playing
+        updateNowPlaying()
     }
 
     // MARK: Reading state
@@ -208,6 +260,7 @@ final class Player {
     }
 
     private func resume() {
+        if !engine.isRunning, file != nil { seekAfterRestart(to: pausedAt, playing: true); return }
         startEngineIfNeeded()
         node.play()
         isPlaying = true
@@ -287,6 +340,7 @@ final class Player {
         stopEngine()
         startFrame = min(frame, max(0, file.length - 1))
         baseSample = 0
+        connect(format: file.processingFormat)
         startEngineIfNeeded()
         scheduleCurrent(from: startFrame)
         if wasPlaying {
@@ -442,5 +496,16 @@ final class Player {
     private func reschedule() {
         let position = elapsed
         seek(to: position)
+    }
+}
+
+
+/// A float shared between the audio thread and the main actor.
+nonisolated final class PeakStore: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: Float = 0
+    var value: Float {
+        get { lock.withLock { stored } }
+        set { lock.withLock { stored = newValue } }
     }
 }
