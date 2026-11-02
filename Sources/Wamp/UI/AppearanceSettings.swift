@@ -3,8 +3,17 @@ import SwiftUI
 /// Settings > Appearance: the accent color. Light and dark mode follow the Mac.
 struct AppearanceSettings: View {
     @Bindable private var store = ThemeStore.shared
+    @Bindable private var player = PlayerThemeStore.shared
 
     var body: some View {
+        Section {
+            Picker("Player theme", selection: $player.theme) {
+                ForEach(PlayerTheme.allCases) { Text($0.name).tag($0) }
+            }
+            .pickerStyle(.segmented)
+        } footer: {
+            Text("Applies to the player, equalizer, and queue windows.")
+        }
         Section {
             AccentPreview()
                 .padding(.vertical, Space.xs)
@@ -30,7 +39,7 @@ struct AppearanceSettings: View {
 /// a button, and a switch. It redraws as people pick a color.
 /// Swap the sample words for ones from this app.
 private struct AccentPreview: View {
-    private let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+    private let shape = RoundedRectangle(cornerRadius: Radius.md, style: .continuous)
 
     var body: some View {
         HStack(spacing: 0) {
@@ -56,9 +65,9 @@ private struct AccentPreview: View {
             }
             .padding(.leading, Space.xs)
             .padding(.bottom, Space.sm)
-            sidebarRow("Inbox", symbol: "tray", selected: true)
-            sidebarRow("Today", symbol: "star", selected: false)
-            sidebarRow("Done", symbol: "checkmark.circle", selected: false)
+            sidebarRow("Library", symbol: "music.note.house", selected: true)
+            sidebarRow("Queue", symbol: "list.bullet", selected: false)
+            sidebarRow("Radio", symbol: "dot.radiowaves.left.and.right", selected: false)
             Spacer(minLength: 0)
         }
         .padding(Space.sm)
@@ -73,30 +82,30 @@ private struct AccentPreview: View {
             .padding(.horizontal, Space.sm)
             .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
             .background(selected ? Palette.accent : .clear,
-                        in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        in: RoundedRectangle(cornerRadius: Radius.sm, style: .continuous))
     }
 
     private var content: some View {
         VStack(alignment: .leading, spacing: Space.sm) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Inbox").font(.headline)
+                Text("Queue").font(.headline)
                 Spacer()
-                Text("1 left").font(.caption).foregroundStyle(Palette.accentText)
+                Text("2 tracks").font(.caption).foregroundStyle(Palette.accentText)
             }
-            task("Pick a color", done: true)
-            task("Ship the first build", done: false, tag: "Today")
+            task("Intro", done: true)
+            task("Radio Station", done: false, tag: "Live")
             Spacer(minLength: 0)
             // Drawn, not real controls: the preview is a picture, and real
             // controls turn gray when the window is not in front.
             HStack {
-                Label("Add Task", systemImage: "plus")
+                Label("Open Files…", systemImage: "plus")
                     .font(.callout.weight(.medium))
                     .foregroundStyle(Palette.onAccent)
                     .padding(.horizontal, Space.md)
                     .frame(height: 24)
                     .background(Palette.accent, in: Capsule())
                 Spacer()
-                Text("Focus").font(.caption).foregroundStyle(.secondary)
+                Text("Shuffle").font(.caption).foregroundStyle(.secondary)
                 Capsule()
                     .fill(Palette.accent)
                     .frame(width: 28, height: 16)
