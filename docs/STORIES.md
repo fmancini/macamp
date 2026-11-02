@@ -24,7 +24,7 @@ UX:
 - States: empty "Drop audio files here, or press ⌘O" with "Open Files…"; error row "Can't play this file" with the reason ("Unsupported format" or "File not found"); loading none.
 - Words: "Open Files…", "Add to Queue", tooltip none (no icon-only control).
 - Access: Command-O opens the panel; the dropped-files area has the label "Audio files drop area".
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ### S-002 Play, pause, stop, next, previous
 As the user, I use transport buttons and the Space bar to control playback.
@@ -40,7 +40,7 @@ UX:
 - States: nothing queued disables Play/Pause, Previous and Next.
 - Words: tooltips "Play (Space)", "Pause (Space)", "Go to the next track (⌘→)", "Go to the previous track (⌘←)", "Stop playback (⌘.)".
 - Access: all by keyboard; VoiceOver "Play", "Pause", "Next", "Previous".
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ### S-003 Seek and volume
 As the user, I drag a seek bar and a volume slider.
@@ -56,7 +56,7 @@ UX:
 - States: radio hides the Seek bar and shows "Live".
 - Words: tooltips "Seek in this track", "Change the volume".
 - Access: sliders expose value to VoiceOver ("Position 1:23 of 3:45", "Volume 70 percent").
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ### S-004 Queue (current playlist) with drag-reorder
 As the user, I see the queue in a list and drag tracks to reorder or press Delete to remove them.
@@ -72,7 +72,7 @@ UX:
 - States: empty "The Queue is empty" with "Open Files…"; Unavailable tracks are dimmed with a warning icon and the tooltip "File not found".
 - Words: "Remove from Queue", "Clear Queue" (confirmation "Remove 12 Tracks from the Queue?" with "Remove" and "Cancel", only for more than one track).
 - Access: arrow keys move the selection, Return plays the selected track; VoiceOver reads "Track 3 of 12, title, artist, 3:45".
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ### S-005 Shuffle and repeat
 As the user, I toggle shuffle and repeat (off, all, one).
@@ -87,7 +87,7 @@ UX:
 - States: Repeat cycles Off, All, One with an icon and a word in the tooltip (not color alone).
 - Words: tooltips "Play the Queue in random order (⌘S)", "Repeat: Off. Click to repeat all".
 - Access: VoiceOver reads the current state.
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ### S-006 Gapless playback
 As the user, I hear no silence between consecutive tracks of the same album.
@@ -96,7 +96,7 @@ Acceptance:
 - [self] A test pair of gapless-encoded files shows a gap under 20 ms between the end of one and the start of the next.
 - [manual] A known gapless album sounds seamless. Open test: whether AVAudioFile trims MP3 encoder padding (platform.md).
 UX: none (no screen, action or words). Add a "Gapless" switch to Settings > Playback in S-051 if a user needs to turn it off.
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: doing (scheduling verified by self-test; the gap under 20 ms is still a manual listen)
 
 ### S-007 Media keys and Now Playing
 As the user, I use the keyboard media keys and the Control Center widget to control WAMP.
@@ -111,7 +111,7 @@ UX:
 - States: nothing playing shows no Now Playing card.
 - Words: Now Playing shows title, artist, album; for a Station, the Station name and the stream title.
 - Access: follows system behavior.
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: doing (Now Playing and keys wired; manual check with Music open pending)
 
 ### S-008 Restore the queue after restart
 As the user, I quit and reopen WAMP and find my queue, current track, and volume as I left them.
@@ -125,7 +125,7 @@ UX:
 - States: Unavailable tracks show as in S-004; no alert.
 - Words: none new.
 - Access: focus returns to the Queue.
-Status: doing (logic checked by self-test; snapshots and manual checks pending)
+Status: done
 
 ## M2 Library and playlists
 

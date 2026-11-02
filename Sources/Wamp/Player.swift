@@ -117,8 +117,11 @@ final class Player {
     var elapsed: Double {
         guard let file else { return 0 }
         guard isPlaying else { return pausedAt }
-        guard let last = node.lastRenderTime, let time = node.playerTime(forNodeTime: last) else { return pausedAt }
         let rate = file.processingFormat.sampleRate
+        // Right after a seek the node has not rendered yet: the segment start is the position.
+        guard let last = node.lastRenderTime, let time = node.playerTime(forNodeTime: last) else {
+            return Double(startFrame) / rate
+        }
         let played = Double(time.sampleTime - baseSample) / rate + Double(startFrame) / rate
         return min(max(0, played), duration)
     }
