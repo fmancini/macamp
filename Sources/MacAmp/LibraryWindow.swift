@@ -22,8 +22,13 @@ struct LibraryWindow: View {
         NavigationSplitView {
             List(selection: $model.selection) {
                 Section {
-                    ForEach(SidebarItem.allCases) { page in
-                        Label(page.title, systemImage: page.symbol).tag(SidebarSelection.page(page))
+                    ForEach(SidebarItem.musicPages) { page in
+                        Label(page.sidebarTitle, systemImage: page.symbol).tag(SidebarSelection.page(page))
+                    }
+                }
+                Section("Radio") {
+                    ForEach(SidebarItem.radioPages) { page in
+                        Label(page.sidebarTitle, systemImage: page.symbol).tag(SidebarSelection.page(page))
                     }
                 }
                 Section("Playlists") {
@@ -54,6 +59,9 @@ struct LibraryWindow: View {
             switch model.selection ?? .page(.library) {
             case .page(.library): LibraryPage()
             case .page(.queue): QueuePage()
+            case .page(.radio): RadioPage()
+            case .page(.favorites): FavoritesPage()
+            case .page(.history): HistoryPage()
             case .playlist(let id): PlaylistPage(id: id)
             }
         }

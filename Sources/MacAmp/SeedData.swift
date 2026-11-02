@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import MacAmpKit
 
 /// Sample tracks for snapshots: APP_SEED=1 with APP_STORE in /tmp fills an
 /// empty Queue with the Mac's own system sounds (real audio files).
@@ -48,6 +49,18 @@ enum SeedData {
         }
         let picks = ["Glass", "Funk", "Frog", "Hero"].map { sounds.appending(path: "\($0).aiff").path }
         library.createPlaylist(name: "Sound Effects", items: picks)
+        for station in [Station(name: "101 SMOOTH JAZZ", url: "http://jking.cdnstream1.com/b22139_128mp3", codec: "MP3", bitrate: 192, country: "USA"),
+                        Station(name: "Europe 1", url: "https://stream.europe1.fr/europe1.aac", codec: "AAC", bitrate: 128, country: "France"),
+                        Station(name: "Radio Paradise", url: "http://stream.radioparadise.com/mp3-192", codec: "MP3", bitrate: 192, country: "USA")] {
+            library.context.insert(FavoriteStation(station))
+        }
+        let now = Date.now
+        for (i, entry) in [("Radio Paradise", "Khruangbin - Maria También"), ("101 SMOOTH JAZZ", "Norah Jones - Don't Know Why"),
+                           ("Europe 1", "Stromae - Papaoutai"), ("Radio Paradise", "Bonobo - Kerala")].enumerated() {
+            let title = PlayedTitle(stationName: entry.0, title: entry.1)
+            title.playedAt = now.addingTimeInterval(Double(-i) * 780)
+            library.context.insert(title)
+        }
         try? library.context.save()
     }
 }

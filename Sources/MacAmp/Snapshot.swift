@@ -48,7 +48,8 @@ enum Snapshot {
                 NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
                 for page in SidebarItem.allCases where only?.contains(page.rawValue) ?? true {
                     model.sidebar = page
-                    try? await Task.sleep(for: .seconds(0.8))
+                    // Browse loads stations from the internet.
+                    try? await Task.sleep(for: .seconds(page == .radio ? 4 : 0.8))
                     capture(to: "\(dir)/\(page.rawValue)-\(mode).png", window: library)
                     if page == SidebarItem.allCases.first, only?.contains("player") ?? true {
                         capture(to: "\(dir)/player-\(mode).png", window: playerWindow)

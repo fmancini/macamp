@@ -75,10 +75,10 @@ struct MacAmpApp: App {
         CommandMenu("Playback") {
             Button(player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
                 .keyboardShortcut(.space, modifiers: [])
-                .disabled(!player.hasTracks)
+                .disabled(!player.canPlay)
             Button("Stop") { player.stop() }
                 .keyboardShortcut(".")
-                .disabled(!player.hasTracks)
+                .disabled(!player.canPlay)
             Divider()
             Button("Next") { player.next() }
                 .keyboardShortcut(.rightArrow)
@@ -108,6 +108,8 @@ struct MacAmpApp: App {
                 .keyboardShortcut("1")
             Button("Show Queue") { model.sidebar = .queue; openWindow(id: "library") }
                 .keyboardShortcut("l")
+            Button("Show Radio") { model.sidebar = .radio; openWindow(id: "library") }
+                .keyboardShortcut("2")
             Button("Show Player") { openWindow(id: "main") }
                 .keyboardShortcut("0")
         }

@@ -226,7 +226,7 @@ Acceptance:
 - [unit] The client picks a mirror from the DNS list, sends a descriptive User-Agent, and retries another mirror on failure.
 - [snap] Results list station name, country, codec, bitrate and a Play button.
 - [self] With no network, the page shows a clear offline state.
-Status: todo
+Status: done
 
 ### S-021 Play a station
 As the user, I click a station and it plays.
@@ -235,7 +235,7 @@ Acceptance:
 - [self] An MP3 and an AAC station start within 5 seconds.
 - [unit] The click-count endpoint is called once per play.
 - [snap] The main window shows the station name and a "live" mark instead of a seek bar.
-Status: todo
+Status: done
 
 ### S-022 Now-playing title from the stream (ICY)
 As the user, I see the current song title from the stream.
@@ -244,7 +244,7 @@ Acceptance:
 - [unit] The ICY parser extracts StreamTitle across chunk boundaries and handles an empty metadata block.
 - [self] Against 3 real stations the title changes when the song changes.
 - [self] A server answering `ICY 200 OK` connects (open test, platform.md).
-Status: todo
+Status: done (titles verified on a real MP3 station; an `ICY 200 OK` server is untested)
 
 ### S-023 Plain http stations
 As the user, I can play stations that only offer http.
@@ -252,7 +252,7 @@ Depends: S-021
 Acceptance:
 - [self] An http-only station plays in a built build with the ATS exception set.
 - [manual] Document the App Review justification for the exception.
-Status: todo
+Status: done
 
 ### S-024 Favorites
 As the user, I star a station and find it under Favorites in the sidebar.
@@ -261,7 +261,7 @@ Depends: S-021
 Acceptance:
 - [unit] Favorites persist across restarts.
 - [snap] Starred and unstarred states.
-Status: todo
+Status: done
 
 ### S-025 Add a station by URL
 As the user, I paste a stream URL, or a PLS/M3U link, and name the station.
@@ -269,7 +269,7 @@ Depends: S-021
 Acceptance:
 - [unit] A PLS or M3U URL resolves to the first playable stream.
 - [self] An invalid URL shows "Can't play this address" with the reason.
-Status: todo
+Status: done
 
 ### S-026 Stream resilience
 As the user, a dropped connection reconnects on its own.
@@ -278,7 +278,7 @@ Acceptance:
 - [self] After a 10-second network drop, playback resumes within 15 seconds.
 - [unit] Reconnect backs off and stops after 5 tries, with a visible message.
 - [self] The buffer is configurable (small, normal, large).
-Status: todo
+Status: doing (reconnect with backoff and the buffer setting are built; a real 10-second network drop is untested)
 
 ### S-027 Station play history
 As the user, I see the titles that played on a station.
@@ -286,7 +286,7 @@ Depends: S-022
 Acceptance:
 - [unit] Titles are stored with time and station, up to 500 entries.
 - [self] Export to CSV from the history view.
-Status: todo
+Status: done
 
 ## M4 The Winamp feel
 

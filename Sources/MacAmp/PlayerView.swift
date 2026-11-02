@@ -39,7 +39,7 @@ struct PlayerView: View {
     private var display: some View {
         TimelineView(.periodic(from: .now, by: 0.25)) { _ in
             HStack(alignment: .top, spacing: Space.md) {
-                Text(Track.clock(shownTime))
+                Text(player.isLive ? "LIVE" : Track.clock(shownTime))
                     .font(.system(size: 28, weight: .medium, design: .monospaced)) // grid: ok
                     .foregroundStyle(Surface.readout)
                     .monospacedDigit()
@@ -66,12 +66,14 @@ struct PlayerView: View {
     private var shownTime: Double { dragging ?? player.elapsed }
 
     private var titleText: String {
+        if let station = player.station { return station.name }
         if let track = player.current { return track.title }
         return "MacAmp"
     }
 
     private var subtitleText: String {
         if let message = player.message { return message }
+        if player.isLive { return player.radioStatus ?? player.streamTitle ?? (player.isPlaying ? "Live" : "Stopped") }
         guard let track = player.current else { return "Drop audio files here, or press \u{2318}O" }
         return track.artist.isEmpty ? "Total \(Track.clock(player.duration))" : "\(track.artist) \u{2022} \(Track.clock(player.duration))"
     }
@@ -89,7 +91,7 @@ struct PlayerView: View {
             }
         }
         .controlSize(.small)
-        .disabled(!player.hasTracks || player.current == nil)
+        .disabled(!player.hasTracks || player.current == nil || player.isLive)
         .help("Seek in this track")
         .accessibilityLabel("Position")
         .accessibilityValue("\(Track.clock(shownTime)) of \(Track.clock(player.duration))")
@@ -97,12 +99,12 @@ struct PlayerView: View {
 
     private var controls: some View {
         HStack(spacing: Space.sm) {
-            transport("backward.fill", "Go to the previous track (\u{2318}\u{2190})", "Previous") { player.previous() }
+            transport("backward.fill", "Go to the previous track (\u{2318}\u{2190})", "Previous", queueOnly: true) { player.previous() }
             transport(player.isPlaying ? "pause.fill" : "play.fill",
                       player.isPlaying ? "Pause (Space)" : "Play (Space)",
                       player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
             transport("stop.fill", "Stop playback (\u{2318}.)", "Stop") { player.stop() }
-            transport("forward.fill", "Go to the next track (\u{2318}\u{2192})", "Next") { player.next() }
+            transport("forward.fill", "Go to the next track (\u{2318}\u{2192})", "Next", queueOnly: true) { player.next() }
             Spacer(minLength: Space.sm)
             toggle("shuffle", "Play the Queue in random order (\u{2318}S)", "Shuffle", on: player.queue.shuffle) { player.toggleShuffle() }
             toggle(player.queue.repeatMode == .one ? "repeat.1" : "repeat",
@@ -121,13 +123,14 @@ struct PlayerView: View {
         }
     }
 
-    private func transport(_ symbol: String, _ help: String, _ label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+    private func transport(_ symbol: String, _ help: String, _ label: String, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
+        let enabled = queueOnly ? (player.hasTracks && !player.isLive) : player.canPlay
+        return Button(action: action) {
             Image(systemName: symbol)
                 .frame(width: 24, height: 24)
         }
         .buttonStyle(.borderless)
-        .disabled(!player.hasTracks)
+        .disabled(!enabled)
         .help(help)
         .accessibilityLabel(label)
     }

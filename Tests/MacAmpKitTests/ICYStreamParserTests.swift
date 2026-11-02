@@ -68,3 +68,8 @@ private func stream(titles: [String?], interval: Int = 8) -> (data: Data, audio:
     let station = try JSONDecoder().decode([RadioBrowserStation].self, from: Data(json.utf8)).first?.station
     #expect(station?.name == "Jazz FM" && station?.url == "http://x/a" && station?.isHLS == false)
 }
+
+@Test func historyCSVQuotesTitles() {
+    let csv = HistoryCSV.make([(Date(timeIntervalSince1970: 0), "Jazz, FM", "She said \"hi\"")])
+    #expect(csv == "Time,Station,Title\n1970-01-01T00:00:00Z,\"Jazz, FM\",\"She said \"\"hi\"\"\"\n")
+}
