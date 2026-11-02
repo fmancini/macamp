@@ -18,12 +18,12 @@ final class PlayerThemeStore {
     static let shared = PlayerThemeStore()
 
     var theme: PlayerTheme {
-        didSet { UserDefaults.standard.set(theme.rawValue, forKey: "appearance.player") }
+        didSet { Store.defaults.set(theme.rawValue, forKey: "appearance.player") }
     }
 
     private init() {
         let raw = ProcessInfo.processInfo.environment["APP_PLAYER_THEME"]
-            ?? UserDefaults.standard.string(forKey: "appearance.player")
+            ?? Store.defaults.string(forKey: "appearance.player")
         theme = raw.flatMap(PlayerTheme.init(rawValue:)) ?? .classic
     }
 }

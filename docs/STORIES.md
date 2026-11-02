@@ -439,6 +439,20 @@ Acceptance:
 - [manual] Review the menu against the Command map in docs/screens/INDEX.md once Swinsian is checked.
 Status: todo
 
+### S-055 Choose light or dark
+As the user, I pick System, Light, or Dark in Settings > Appearance and every window follows.
+Screens: settings-appearance
+Acceptance:
+- [self] The choice applies to all windows at once and survives a restart.
+- [snap] Appearance tab shows a System / Light / Dark control, in light and dark.
+- [unit] An unknown saved value falls back to System.
+UX:
+- Flow: Settings > Appearance > segmented control -> windows change at once.
+- Surface: inline (changes one value on screen).
+- Words: "Appearance", "System", "Light", "Dark"; footer "System follows the Mac's light or dark setting."
+- Access: the control is keyboard operable; VoiceOver reads "Appearance, System".
+Status: done
+
 ## Later
 - Smart playlists (09-smart-playlist-editor), art grid (03-art-grid), find and replace (06-find-replace), separate playlist windows.
 - Skin support for .wsz and plug-in visualizations such as MilkDrop.

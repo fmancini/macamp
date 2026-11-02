@@ -108,6 +108,14 @@ enum SelfTest {
             QueueStore.save(saved, to: dir.appending(path: "queue.json"))
             check("the Queue survives a save and load", QueueStore.load(from: dir.appending(path: "queue.json")) == saved)
 
+            // S-055 light and dark
+            AppearanceStore.shared.mode = .dark
+            check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)
+            AppearanceStore.shared.mode = .light
+            check("Light mode applies to the app", NSApp.appearance?.name == .aqua)
+            AppearanceStore.shared.mode = .system
+            check("System mode follows the Mac", NSApp.appearance == nil)
+
             player.clearQueue()
             check("Clear Queue empties the Queue", player.queue.isEmpty && !player.isPlaying)
             try? FileManager.default.removeItem(at: dir)

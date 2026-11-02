@@ -8,6 +8,7 @@ Look: Apple's own parts, plus a custom player look in the player windows only (d
 - Accent fills and tint: `.tint` or `Palette.accent`.
 - Accent-colored text: `Palette.accentText`. Text on an accent fill: `Palette.onAccent`, never fixed white.
 - People change the accent in Settings > Appearance.
+- `AppearanceMode.swift`: System (default), Light, or Dark, set on `NSApp.appearance`. Asked for by the owner; Apple advises following the Mac, so System stays the default.
 
 ## Surfaces.swift: the player look
 - `PlayerTheme` is `classic` (LCD display, green readout) or `mac` (system materials, accent readout). It changes the player, equalizer, and queue windows only. The Library window, Settings, and menu bar popover stay native.

@@ -64,7 +64,8 @@ enum Snapshot {
                     for tab in SettingsTab.allCases {
                         model.settingsTab = tab
                         try? await Task.sleep(for: .seconds(0.8))
-                        let settings = NSApp.windows.first { $0.isVisible && $0 !== main && !$0.isSheet }
+                        let titles = SettingsTab.allCases.map(\.title)
+                        let settings = NSApp.windows.first { $0.isVisible && $0 !== main && !$0.isSheet && titles.contains($0.title) }
                         capture(to: "\(dir)/settings-\(tab.rawValue)-\(mode).png", window: settings)
                     }
                 }

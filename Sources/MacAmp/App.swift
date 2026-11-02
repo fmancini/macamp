@@ -103,6 +103,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Started from a terminal, the process is not a foreground app yet.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        AppearanceStore.shared.apply()
         // Test modes start here, so they do not depend on a window being on screen.
         Task { @MainActor in
             SeedData.insertIfRequested(player: Player.shared)
