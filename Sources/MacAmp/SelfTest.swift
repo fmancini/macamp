@@ -1,5 +1,6 @@
 import AppKit
 import AVFoundation
+import SwiftData
 import MacAmpKit
 
 /// Self-test for agents: runs the app's real functions on test files,
@@ -26,7 +27,7 @@ enum SelfTest {
         }
         Task {
             try? await Task.sleep(for: .seconds(0.5))
-            let dir = FileManager.default.temporaryDirectory.appending(path: "macamp-selftest", directoryHint: .isDirectory)
+            let dir = URL.cachesDirectory.appending(path: "macamp-selftest", directoryHint: .isDirectory)
             try? FileManager.default.removeItem(at: dir)
             try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             let a = silence(dir.appending(path: "a.wav"), seconds: 8, rate: 44_100)
@@ -107,6 +108,30 @@ enum SelfTest {
             let saved = player.queue
             QueueStore.save(saved, to: dir.appending(path: "queue.json"))
             check("the Queue survives a save and load", QueueStore.load(from: dir.appending(path: "queue.json")) == saved)
+
+            // S-010 and S-011 Library folders
+            let music = dir.appending(path: "Music/Album", directoryHint: .isDirectory)
+            try? FileManager.default.createDirectory(at: music, withIntermediateDirectories: true)
+            let l1 = silence(music.appending(path: "one.wav"), seconds: 2, rate: 44_100)
+            _ = silence(music.appending(path: "two.wav"), seconds: 3, rate: 44_100)
+            _ = silence(music.appending(path: "three.wav"), seconds: 4, rate: 44_100)
+            try? Data("notes".utf8).write(to: music.appending(path: "notes.txt"))
+            let library = LibraryModel.shared
+            await library.addFolder(dir.appending(path: "Music"))
+            check("a scanned folder adds its audio files", library.trackCount == 3, "count \(library.trackCount)")
+            let scannedTracks = (try? library.context.fetch(FetchDescriptor<LibraryTrack>())) ?? []
+            check("tags and duration are read", scannedTracks.contains { abs($0.duration - 3) < 0.1 })
+            try? FileManager.default.removeItem(at: l1)
+            await library.syncAll()
+            let gone = ((try? library.context.fetch(FetchDescriptor<LibraryTrack>())) ?? []).filter { !$0.isAvailable }
+            check("a deleted file is marked unavailable, not dropped", gone.count == 1 && library.trackCount == 3)
+            _ = silence(music.appending(path: "four.wav"), seconds: 2, rate: 44_100)
+            var waited = 0.0
+            while library.trackCount < 4, waited < 12 {
+                try? await Task.sleep(for: .seconds(0.5))
+                waited += 0.5
+            }
+            check("a new file in a watched folder appears on its own", library.trackCount == 4, "count \(library.trackCount) after \(waited) s")
 
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark

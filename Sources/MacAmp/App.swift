@@ -1,4 +1,5 @@
 import AppKit
+import SwiftData
 import SwiftUI
 
 // MacAmp
@@ -145,5 +146,23 @@ enum Store {
             return URL(fileURLWithPath: path + ".queue.json")
         }
         return directory.appending(path: "queue.json")
+    }
+}
+
+extension Store {
+    static var databaseURL: URL {
+        if let path = ProcessInfo.processInfo.environment["APP_STORE"], !path.isEmpty {
+            return URL(fileURLWithPath: path)
+        }
+        return directory.appending(path: "MacAmp.store")
+    }
+
+    static func makeContainer() -> ModelContainer {
+        do {
+            return try ModelContainer(for: LibraryTrack.self, LibraryFolder.self, Playlist.self,
+                                      configurations: ModelConfiguration(url: databaseURL))
+        } catch {
+            fatalError("Could not open the database at \(databaseURL.path): \(error)")
+        }
     }
 }
