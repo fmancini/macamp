@@ -188,6 +188,26 @@ final class Player {
         return (title ?? nil, artist ?? nil, duration.flatMap { $0.isFinite ? $0 : nil })
     }
 
+    // MARK: Playing from the Library and playlists
+
+    /// Replaces the Queue with `tracks` and plays the one at `index`.
+    func play(_ tracks: [Track], startAt index: Int) {
+        guard tracks.indices.contains(index) else { return }
+        registerUndo("Replace Queue")
+        queue.clear()
+        queue.append(tracks)
+        file = nil
+        message = nil
+        playTrack(tracks[index].id)
+    }
+
+    /// Adds tracks to the end of the Queue without changing what plays.
+    func addToQueue(_ tracks: [Track]) {
+        guard !tracks.isEmpty else { return }
+        registerUndo("Add to Queue")
+        queue.append(tracks)
+    }
+
     // MARK: Queue editing
 
     func remove(ids: Set<Track.ID>) {

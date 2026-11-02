@@ -36,6 +36,7 @@ struct MacAmpApp: App {
                 .environment(player)
                 .themed()
                 .frame(minWidth: 640, minHeight: 400)
+                .modelContainer(LibraryModel.shared.container)
         }
         .defaultSize(width: 880, height: 560)
         .defaultLaunchBehavior(.presented)
@@ -56,6 +57,20 @@ struct MacAmpApp: App {
         CommandGroup(replacing: .newItem) {
             Button("Open Files\u{2026}") { Player.chooseFiles { player.open($0) } }
                 .keyboardShortcut("o")
+        }
+        CommandGroup(after: .newItem) {
+            Button("Add Folder to Library\u{2026}") {
+                LibraryPanels.chooseFolder { url in Task { await LibraryModel.shared.addFolder(url) } }
+            }
+            .keyboardShortcut("o", modifiers: [.command, .shift])
+            Button("Import Playlist\u{2026}") {
+                LibraryPanels.choosePlaylist { url in
+                    if let playlist = LibraryModel.shared.importPlaylist(from: url) {
+                        model.selection = .playlist(playlist.uuid)
+                        openWindow(id: "library")
+                    }
+                }
+            }
         }
         CommandMenu("Playback") {
             Button(player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
@@ -109,6 +124,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             SeedData.insertIfRequested(player: Player.shared)
             SelfTest.runIfRequested(player: Player.shared)
+            // Bring the Library in step with the disk at launch.
+            if !Store.isOverridden { await LibraryModel.shared.syncAll() }
         }
     }
 

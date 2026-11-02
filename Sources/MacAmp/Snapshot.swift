@@ -55,6 +55,15 @@ enum Snapshot {
                     }
                 }
             }
+            // A playlist page, once per appearance.
+            if only?.contains("playlist") ?? true, let playlist = LibraryModel.shared.playlists.first {
+                for mode in ["light", "dark"] {
+                    NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
+                    model.selection = .playlist(playlist.uuid)
+                    try? await Task.sleep(for: .seconds(0.8))
+                    capture(to: "\(dir)/playlist-\(mode).png", window: NSApp.windows.first { $0.canBecomeMain && $0.title == playlist.name })
+                }
+            }
             if only == nil || only?.contains("settings") == true {
                 let main = library
                 openSettings()

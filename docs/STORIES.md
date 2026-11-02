@@ -136,7 +136,7 @@ Acceptance:
 - [self] A folder of 5,000 files finishes scanning without freezing the window; progress is shown.
 - [unit] Tags (title, artist, album, genre, year, track number, duration) are read from each file.
 - [manual] The folder stays readable after relaunch (security-scoped bookmark).
-Status: todo
+Status: done
 
 ### S-011 Folder watching
 As the user, new or removed files in a library folder appear or disappear on their own.
@@ -144,7 +144,7 @@ Depends: S-010
 Acceptance:
 - [self] A file copied into a watched folder shows up within 10 seconds.
 - [self] A deleted file is marked unavailable, not silently dropped.
-Status: todo
+Status: done
 
 ### S-012 Library table with custom columns
 As the user, I see all tracks in a table and choose which columns show.
@@ -153,7 +153,7 @@ Depends: S-010
 Acceptance:
 - [snap] Table with sortable column headers; a context menu on the header toggles columns.
 - [self] A 20,000-track library scrolls at the display's refresh rate with no frame drops in the profiler.
-Status: todo
+Status: doing (built and snapshot; scrolling with 20,000 tracks not measured)
 
 ### S-013 Search the library
 As the user, I type in a search field and the table filters by title, artist or album.
@@ -161,7 +161,7 @@ Depends: S-012
 Acceptance:
 - [unit] The filter matches case- and accent-insensitively.
 - [self] Results update within 100 ms on a 20,000-track library.
-Status: todo
+Status: doing (built; the 100 ms target on 20,000 tracks not measured)
 
 ### S-014 Column browser
 As the user, I narrow the library with genre, artist and album columns.
@@ -170,7 +170,7 @@ Depends: S-012
 Acceptance:
 - [snap] A browser row with three columns above the table; "All" is the first entry in each.
 - [unit] Selecting an artist limits the album column to that artist.
-Status: todo
+Status: done
 
 ### S-015 Save a playlist
 As the user, I save the queue as a named playlist and find it in the sidebar.
@@ -179,7 +179,7 @@ Depends: S-004
 Acceptance:
 - [snap] Sidebar lists Library, Radio, and playlists.
 - [unit] Playlists persist across restarts.
-Status: todo
+Status: done
 
 ### S-016 Edit a playlist
 As the user, I rename, delete, add tracks by drag, and reorder a playlist.
@@ -188,7 +188,7 @@ Depends: S-015
 Acceptance:
 - [self] Dragging tracks from the library onto a sidebar playlist adds them.
 - [self] Delete asks for confirmation if the playlist has more than one track.
-Status: todo
+Status: done
 
 ### S-017 Import and export M3U/M3U8/PLS
 As the user, I import a playlist file and export mine.
@@ -197,7 +197,7 @@ Acceptance:
 - [unit] M3U with #EXTINF and PLS files parse into tracks; relative paths resolve against the file location.
 - [unit] Export then import yields the same track list.
 - [self] A URL entry in a playlist file becomes a radio entry.
-Status: todo
+Status: done
 
 ### S-018 Track inspector
 As the user, I open an inspector for the selected track(s) and see its tags and artwork.
@@ -206,7 +206,7 @@ Depends: S-012
 Acceptance:
 - [snap] A side panel with tag fields and artwork; it can be hidden.
 - [self] Selecting several tracks shows "multiple values" for fields that differ.
-Status: todo
+Status: done
 
 ### S-019 Edit tags
 As the user, I change tags on one or many tracks and they are saved to the files.
@@ -215,7 +215,7 @@ Depends: S-018
 Acceptance:
 - [unit] Editing title on an MP3 and an M4A writes the tag and reads back the same.
 - [self] A read-only file shows an error and leaves the tags unchanged.
-Status: todo
+Status: todo (blocked: AVFoundation cannot write tags; needs a tag library such as TagLib)
 
 ## M3 Internet radio
 

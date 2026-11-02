@@ -133,6 +133,22 @@ enum SelfTest {
             }
             check("a new file in a watched folder appears on its own", library.trackCount == 4, "count \(library.trackCount) after \(waited) s")
 
+            // S-015, S-016, S-017 playlists
+            let roadTrip = library.createPlaylist(name: "  Road   trip ", items: player.queue.tracks.map(\.path))
+            check("a playlist is roadTrip from the Queue", roadTrip.name == "Road trip" && roadTrip.items.count == player.queue.tracks.count)
+            library.add([l1.path], to: roadTrip)
+            check("tracks can be added to a playlist", roadTrip.items.last == l1.path)
+            let m3u = dir.appending(path: "list.m3u")
+            library.exportPlaylist(roadTrip, as: .m3u, to: m3u)
+            let imported = library.importPlaylist(from: m3u)
+            check("an exported M3U imports as the same playlist", imported?.items == roadTrip.items)
+            let pls = dir.appending(path: "list.pls")
+            library.exportPlaylist(roadTrip, as: .pls, to: pls)
+            check("an exported PLS imports as the same playlist", library.importPlaylist(from: pls)?.items == roadTrip.items)
+            check("playable tracks of a playlist come from files", library.tracks(of: roadTrip).count == roadTrip.items.count)
+            library.deletePlaylist(roadTrip)
+            check("a playlist can be deleted", !library.playlists.contains { $0.uuid == roadTrip.uuid })
+
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark
             check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)

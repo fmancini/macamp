@@ -24,10 +24,21 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     }
 }
 
+/// What the Library window's sidebar has selected.
+enum SidebarSelection: Hashable {
+    case page(SidebarItem)
+    case playlist(UUID)
+}
+
 /// App-wide state that menus, toolbars, and views share.
 @Observable
 final class AppModel {
-    var sidebar: SidebarItem? = .library
+    var selection: SidebarSelection? = .page(.library)
+    /// The page selected, when a page (not a playlist) is.
+    var sidebar: SidebarItem? {
+        get { if case .page(let page) = selection { page } else { nil } }
+        set { if let newValue { selection = .page(newValue) } }
+    }
     /// Settings reopens on the last tab. Test and snapshot runs leave it alone.
     var settingsTab: SettingsTab = SettingsTab(rawValue: UserDefaults.standard.string(forKey: "settings.tab") ?? "") ?? .general {
         didSet { if !Store.isOverridden { UserDefaults.standard.set(settingsTab.rawValue, forKey: "settings.tab") } }

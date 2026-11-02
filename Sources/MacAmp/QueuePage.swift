@@ -6,6 +6,8 @@ struct QueuePage: View {
     @Environment(Player.self) private var player
     @State private var selection: Set<Track.ID> = []
     @State private var confirmClear = false
+    @State private var saving = false
+    @State private var playlistName = ""
 
     var body: some View {
         List(selection: $selection) {
@@ -52,12 +54,24 @@ struct QueuePage: View {
                     .help("Add audio files to the Queue (\u{2318}O)")
             }
             ToolbarItem {
+                Button("Save as Playlist\u{2026}", systemImage: "square.and.arrow.down") { playlistName = ""; saving = true }
+                    .help("Save the Queue as a playlist")
+                    .disabled(player.queue.isEmpty)
+            }
+            ToolbarItem {
                 Button("Clear Queue", systemImage: "trash") {
                     if player.queue.tracks.count > 1 { confirmClear = true } else { player.clearQueue() }
                 }
                 .help("Remove every track from the Queue")
                 .disabled(player.queue.isEmpty)
             }
+        }
+        .alert("Save as Playlist", isPresented: $saving) {
+            TextField("Name", text: $playlistName)
+            Button("Save") {
+                LibraryModel.shared.createPlaylist(name: playlistName, items: player.queue.tracks.map(\.path))
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .confirmationDialog("Remove \(player.queue.tracks.count) Tracks from the Queue?",
                             isPresented: $confirmClear) {
