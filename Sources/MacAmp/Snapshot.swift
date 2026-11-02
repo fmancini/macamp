@@ -3,7 +3,7 @@ import IOKit.pwr_mgt
 import SwiftUI
 
 /// Screenshot mode for agents.
-///   APP_STORE=/tmp/test.store APP_SNAPSHOT=/tmp/shots ~/Applications/Wamp.app/Contents/MacOS/Wamp
+///   APP_STORE=/tmp/test.store APP_SNAPSHOT=/tmp/shots ~/Applications/MacAmp.app/Contents/MacOS/MacAmp
 /// writes <page>-light.png and <page>-dark.png for every sidebar page, and
 /// settings-<tab>-light.png and settings-<tab>-dark.png for every Settings tab, then quits.
 /// Each PNG gets a <page>-<mode>-layout.json with the grid probes (tools/check-layout.swift).
@@ -41,8 +41,8 @@ enum Snapshot {
                 _ = id
             }
             try? await Task.sleep(for: .seconds(0.8))
-            let playerWindow = NSApp.windows.first { $0.title == "Wamp" && $0.canBecomeMain }
-            let library = NSApp.windows.first { $0.canBecomeMain && !$0.isSheet && $0.title != "Wamp"
+            let playerWindow = NSApp.windows.first { $0.title == "MacAmp" && $0.canBecomeMain }
+            let library = NSApp.windows.first { $0.canBecomeMain && !$0.isSheet && $0.title != "MacAmp"
                 && SidebarItem.allCases.map(\.title).contains($0.title) }
             for mode in ["light", "dark"] {
                 NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)

@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 import SwiftUI
-import WampKit
+import MacAmpKit
 
 /// The Library window's sidebar pages. Snapshot mode walks through every case.
 enum SidebarItem: String, CaseIterable, Identifiable {

@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "Wamp",
+    name: "MacAmp",
     platforms: [.macOS(.v26)],
     targets: [
         // Rules and data logic with no SwiftUI, so tests run without the app.
-        .target(name: "WampKit"),
+        .target(name: "MacAmpKit"),
         .executableTarget(
-            name: "Wamp",
-            dependencies: ["WampKit"],
+            name: "MacAmp",
+            dependencies: ["MacAmpKit"],
             // App code runs on the main thread unless you say otherwise.
             swiftSettings: [.defaultIsolation(MainActor.self)]
         ),
-        .testTarget(name: "WampKitTests", dependencies: ["WampKit"]),
+        .testTarget(name: "MacAmpKitTests", dependencies: ["MacAmpKit"]),
     ]
 )

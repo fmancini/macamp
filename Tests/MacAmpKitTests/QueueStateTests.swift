@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import WampKit
+@testable import MacAmpKit
 
 private func tracks(_ n: Int) -> [Track] {
     (1...n).map { Track(url: URL(fileURLWithPath: "/tmp/t\($0).mp3")) }
@@ -94,7 +94,7 @@ private func tracks(_ n: Int) -> [Track] {
     q.append(tracks(3))
     q.shuffle = true
     q.repeatMode = .all
-    let url = FileManager.default.temporaryDirectory.appending(path: "wamp-queue-test.json")
+    let url = FileManager.default.temporaryDirectory.appending(path: "macamp-queue-test.json")
     QueueStore.save(q, to: url)
     #expect(QueueStore.load(from: url) == q)
     try? FileManager.default.removeItem(at: url)

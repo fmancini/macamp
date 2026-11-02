@@ -1,5 +1,5 @@
 import SwiftUI
-import WampKit
+import MacAmpKit
 
 /// The Queue: tracks that play now and next. Drag to reorder, Delete to remove.
 struct QueuePage: View {

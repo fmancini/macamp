@@ -1,6 +1,6 @@
 #!/bin/zsh
-# Builds Wamp and installs it to ~/Applications/Wamp.app.
-# Build products live in ~/Library/Developer/Wamp, outside the repo
+# Builds MacAmp and installs it to ~/Applications/MacAmp.app.
+# Build products live in ~/Library/Developer/MacAmp, outside the repo
 # (and outside Dropbox or iCloud, which would try to sync them).
 #
 # Usage: ./build.sh            release build, install
@@ -8,7 +8,7 @@
 #        ./build.sh --open     install, then quit the running copy and open the new one
 set -euo pipefail
 here=${0:A:h}
-name="Wamp"
+name="MacAmp"
 scratch="$HOME/Library/Developer/$name/build"
 config=release
 [[ " $* " == *" --debug "* ]] && config=debug

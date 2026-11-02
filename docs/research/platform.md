@@ -1,6 +1,6 @@
-# Platform: macOS APIs for WAMP
+# Platform: macOS APIs for MacAmp
 
-Research for WAMP. Done 2026-11-02.
+Research for MacAmp. Done 2026-11-02.
 [V] verified in a source, [K] from knowledge, [U] unverified, test first.
 
 Only two web searches backed this track. Almost everything is [K] or [U] and needs a prototype.

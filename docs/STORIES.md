@@ -1,8 +1,8 @@
-# WAMP stories
+# MacAmp stories
 
-Backlog for WAMP, a Winamp-style Mac player with playlists and free internet radio. Built 2026-11-02 from docs/research/*.md and docs/screens/INDEX.md. There is no docs/BRIEF.md yet, so price and OGG scope are open (see Open decisions).
+Backlog for MacAmp, a Winamp-style Mac player with playlists and free internet radio. Built 2026-11-02 from docs/research/*.md and docs/screens/INDEX.md. There is no docs/BRIEF.md yet, so price and OGG scope are open (see Open decisions).
 Checks: [snap] snapshot, [unit] unit test, [self] self-test, [manual] a person must try it.
-"Screens:" names sections of docs/screens/INDEX.md (Swinsian, no PNGs) or WAMP snapshot pages to create.
+"Screens:" names sections of docs/screens/INDEX.md (Swinsian, no PNGs) or MacAmp snapshot pages to create.
 Status: todo, doing, done, dropped.
 
 ## Open decisions
@@ -13,7 +13,7 @@ Status: todo, doing, done, dropped.
 
 ### S-001 Open files and play one
 As the user, I choose Open Files (Command-O) or drop audio files on the window, and the first one plays.
-Screens: WAMP snapshot page "main-playing"
+Screens: MacAmp snapshot page "main-playing"
 Acceptance:
 - [unit] MP3, AAC, ALAC, FLAC, WAV and AIFF files decode and play.
 - [self] A file that cannot be decoded shows an error row, and the next track plays.
@@ -99,10 +99,10 @@ UX: none (no screen, action or words). Add a "Gapless" switch to Settings > Play
 Status: doing (scheduling verified by self-test; the gap under 20 ms is still a manual listen)
 
 ### S-007 Media keys and Now Playing
-As the user, I use the keyboard media keys and the Control Center widget to control WAMP.
+As the user, I use the keyboard media keys and the Control Center widget to control MacAmp.
 Depends: S-002
 Acceptance:
-- [self] Play/pause, next and previous keys act on WAMP while it is playing.
+- [self] Play/pause, next and previous keys act on MacAmp while it is playing.
 - [self] Control Center shows title, artist, art and elapsed time.
 - [manual] With Music also open, the last app that played gets the keys.
 UX:
@@ -114,7 +114,7 @@ UX:
 Status: doing (Now Playing and keys wired; manual check with Music open pending)
 
 ### S-008 Restore the queue after restart
-As the user, I quit and reopen WAMP and find my queue, current track, and volume as I left them.
+As the user, I quit and reopen MacAmp and find my queue, current track, and volume as I left them.
 Depends: S-004
 Acceptance:
 - [self] After a relaunch the queue order and the playing track are the same; playback is paused.
@@ -130,7 +130,7 @@ Status: done
 ## M2 Library and playlists
 
 ### S-010 Add a music folder
-As the user, I pick a folder and WAMP scans it into my library.
+As the user, I pick a folder and MacAmp scans it into my library.
 Screens: 01-main-library (INDEX), snapshot "library"
 Acceptance:
 - [self] A folder of 5,000 files finishes scanning without freezing the window; progress is shown.
@@ -354,11 +354,11 @@ Status: todo
 ## M5 Recording and audio extras
 
 ### S-040 Record a station
-As the user, I press Record and WAMP saves what I hear to a file.
+As the user, I press Record and MacAmp saves what I hear to a file.
 Depends: S-022
 Acceptance:
 - [unit] Raw stream bytes are written without re-encoding.
-- [self] A 2-minute recording opens and plays in WAMP.
+- [self] A 2-minute recording opens and plays in MacAmp.
 - [manual] Settings explain that the user is responsible for the legal use of recordings.
 Status: todo
 
@@ -426,7 +426,7 @@ Acceptance:
 Status: todo
 
 ### S-054 Spanish and English interface
-As the user, I use WAMP in English or Spanish, following the system language.
+As the user, I use MacAmp in English or Spanish, following the system language.
 Acceptance:
 - [self] Every user-visible string is in a String Catalog with both languages; no hardcoded text.
 - [snap] Main window and Settings in both languages; long Spanish labels do not truncate.

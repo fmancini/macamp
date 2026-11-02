@@ -1,24 +1,24 @@
 import AppKit
 import SwiftUI
 
-// Wamp
-//   Wamp                      the app
-//   APP_STORE=<file> Wamp     use another database (tests, experiments)
-//   APP_SNAPSHOT=<dir> Wamp   save a PNG of every sidebar page and Settings tab in light and dark mode, then quit
-//   APP_SEED=1 Wamp           fill an empty Queue with sample tracks (tools/snap.sh)
-//   Wamp --selftest           run the self-test on a /tmp store and quit with 0 or 1 (tools/selftest.sh)
-//   APP_ACCENT=<id> Wamp      run with another accent from Theme.all (UI/Theme.swift)
-//   APP_GRID=1 Wamp           draw the 8 pt grid and the layout probes over the window
+// MacAmp
+//   MacAmp                      the app
+//   APP_STORE=<file> MacAmp     use another database (tests, experiments)
+//   APP_SNAPSHOT=<dir> MacAmp   save a PNG of every sidebar page and Settings tab in light and dark mode, then quit
+//   APP_SEED=1 MacAmp           fill an empty Queue with sample tracks (tools/snap.sh)
+//   MacAmp --selftest           run the self-test on a /tmp store and quit with 0 or 1 (tools/selftest.sh)
+//   APP_ACCENT=<id> MacAmp      run with another accent from Theme.all (UI/Theme.swift)
+//   APP_GRID=1 MacAmp           draw the 8 pt grid and the layout probes over the window
 
 @main
-struct WampApp: App {
+struct MacAmpApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var model = AppModel()
     @State private var player = Player.shared
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
-        Window("Wamp", id: "main") {
+        Window("MacAmp", id: "main") {
             PlayerView()
                 .environment(model)
                 .environment(player)
@@ -118,7 +118,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-/// Where the data lives: ~/Library/Application Support/Wamp/
+/// Where the data lives: ~/Library/Application Support/MacAmp/
 enum Store {
     /// True when APP_STORE points somewhere else (tests, snapshots, seed data).
     static var isOverridden: Bool {
@@ -127,14 +127,14 @@ enum Store {
 
     /// Settings and volume. Test and snapshot runs never touch the real ones.
     static var defaults: UserDefaults {
-        isOverridden ? (UserDefaults(suiteName: "com.felipemancini.wamp.test") ?? .standard) : .standard
+        isOverridden ? (UserDefaults(suiteName: "com.felipemancini.macamp.test") ?? .standard) : .standard
     }
 
     static var directory: URL {
         if let path = ProcessInfo.processInfo.environment["APP_STORE"], !path.isEmpty {
             return URL(fileURLWithPath: path).deletingLastPathComponent()
         }
-        let dir = URL.applicationSupportDirectory.appending(path: "Wamp", directoryHint: .isDirectory)
+        let dir = URL.applicationSupportDirectory.appending(path: "MacAmp", directoryHint: .isDirectory)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }

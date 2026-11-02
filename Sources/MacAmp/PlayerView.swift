@@ -1,8 +1,8 @@
 import SwiftUI
-import WampKit
+import MacAmpKit
 
 /// The main player window: display, seek bar, transport, volume.
-/// Custom compact chrome on purpose: the display is Wamp's identity
+/// Custom compact chrome on purpose: the display is MacAmp's identity
 /// (docs/DESIGN.md). Colors come from `Surface`.
 struct PlayerView: View {
     @Environment(Player.self) private var player
@@ -67,7 +67,7 @@ struct PlayerView: View {
 
     private var titleText: String {
         if let track = player.current { return track.title }
-        return "Wamp"
+        return "MacAmp"
     }
 
     private var subtitleText: String {

@@ -1,6 +1,6 @@
-# Wamp
+# MacAmp
 
-A free Winamp-style music player for Mac that plays local files, manages playlists, and streams internet radio, for someone who misses Winamp and does not want a subscription. Bundle id: `com.felipemancini.wamp`. Project folder: `/Users/felipemancini/dev/os-wamp`.
+A free Winamp-style music player for Mac that plays local files, manages playlists, and streams internet radio, for someone who misses Winamp and does not want a subscription. Bundle id: `com.felipemancini.macamp`. Project folder: `/Users/felipemancini/dev/os-wamp`.
 
 ## Replaces
 Winamp on Windows. On Mac: Cog (no library), Swinsian ($34.95, no radio), Vox (radio is paid).

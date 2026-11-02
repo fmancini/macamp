@@ -2,7 +2,7 @@ import AVFoundation
 import MediaPlayer
 import Observation
 import UniformTypeIdentifiers
-import WampKit
+import MacAmpKit
 
 /// Plays the Queue. Local files go through AVAudioEngine; the next track is
 /// scheduled before the current one ends, so same-format tracks play gapless.

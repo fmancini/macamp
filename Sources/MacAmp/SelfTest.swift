@@ -1,10 +1,10 @@
 import AppKit
 import AVFoundation
-import WampKit
+import MacAmpKit
 
 /// Self-test for agents: runs the app's real functions on test files,
 /// prints PASS or FAIL per check, and quits with exit code 0 or 1.
-///   APP_STORE=/tmp/Wamp-self.store ~/Applications/Wamp.app/Contents/MacOS/Wamp --selftest
+///   APP_STORE=/tmp/MacAmp-self.store ~/Applications/MacAmp.app/Contents/MacOS/MacAmp --selftest
 /// (tools/selftest.sh does this.) Add a check for every story with logic.
 /// Output is muted (the player's volume is 0 whenever APP_STORE is set).
 @MainActor
@@ -26,7 +26,7 @@ enum SelfTest {
         }
         Task {
             try? await Task.sleep(for: .seconds(0.5))
-            let dir = FileManager.default.temporaryDirectory.appending(path: "wamp-selftest", directoryHint: .isDirectory)
+            let dir = FileManager.default.temporaryDirectory.appending(path: "macamp-selftest", directoryHint: .isDirectory)
             try? FileManager.default.removeItem(at: dir)
             try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             let a = silence(dir.appending(path: "a.wav"), seconds: 8, rate: 44_100)

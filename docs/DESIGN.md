@@ -1,4 +1,4 @@
-# Wamp design plan
+# MacAmp design plan
 
 Written 2026-11-02 with the mac-design skill. Read with docs/BRIEF.md and docs/STORIES.md.
 
@@ -50,7 +50,7 @@ One `ContentUnavailableView` per page, with the first action as a button:
 - Favorites: "No Favorite Stations" - "Browse Stations"
 - History: "Nothing Played Yet"
 - Search with no matches: system search-empty view.
-Main player with nothing queued: transport disabled, display reads "Wamp" and "Drop audio files here, or press ⌘O".
+Main player with nothing queued: transport disabled, display reads "MacAmp" and "Drop audio files here, or press ⌘O".
 
 ## 5. Feeling
 Quick, familiar, a little nostalgic. Controls answer in the same frame; the spectrum is alive but quiet. Motion is short fades and slides, fades only under Reduce Motion.

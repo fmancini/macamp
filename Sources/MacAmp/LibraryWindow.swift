@@ -1,5 +1,5 @@
 import SwiftUI
-import WampKit
+import MacAmpKit
 
 /// The Library window: a native sidebar window with the Library and the Queue.
 struct LibraryWindow: View {

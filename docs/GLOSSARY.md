@@ -1,4 +1,4 @@
-# WAMP glossary
+# MacAmp glossary
 
 One name per thing. UI language: English (default; confirm in app-brief).
 
@@ -13,7 +13,7 @@ One name per thing. UI language: English (default; confirm in app-brief).
 | Stop | End playback and return to the start of the track | halt |
 | Next / Previous | Go to the next or previous track in the Queue | skip, back |
 | Seek bar | The bar showing and changing the position in a track | progress bar, scrubber |
-| Volume | Output loudness of WAMP | gain, level |
+| Volume | Output loudness of MacAmp | gain, level |
 | Shuffle | Play the Queue in random order, each track once | random |
 | Repeat | Replay the Queue (All) or the track (One) | loop |
 | Add to Queue | Put a track at the end of the Queue | enqueue, append |

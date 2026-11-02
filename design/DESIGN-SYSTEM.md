@@ -1,10 +1,10 @@
-# Wamp design system
+# MacAmp design system
 
-Tokens live in `Sources/Wamp/UI/`. Never use raw colors, radii, or durations in views.
+Tokens live in `Sources/MacAmp/UI/`. Never use raw colors, radii, or durations in views.
 Look: Apple's own parts, plus a custom player look in the player windows only (docs/DESIGN.md).
 
 ## Theme.swift: the accent
-- Accent stays `system` (follows the Mac). `ThemeStore.brand` is nil: Wamp has no brand color.
+- Accent stays `system` (follows the Mac). `ThemeStore.brand` is nil: MacAmp has no brand color.
 - Accent fills and tint: `.tint` or `Palette.accent`.
 - Accent-colored text: `Palette.accentText`. Text on an accent fill: `Palette.onAccent`, never fixed white.
 - People change the accent in Settings > Appearance.

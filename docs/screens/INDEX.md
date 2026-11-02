@@ -1,9 +1,9 @@
 # Swinsian reference index (from public pages)
 
-Reference app for WAMP: Swinsian 3. Built on 2026-11-02 from public pages only, because Swinsian is not installed and computer use was unavailable. There are no PNGs. Each section links the vendor's own screenshot instead.
+Reference app for MacAmp: Swinsian 3. Built on 2026-11-02 from public pages only, because Swinsian is not installed and computer use was unavailable. There are no PNGs. Each section links the vendor's own screenshot instead.
 Tags: [V] stated on a page, [K] general knowledge of Swinsian or player conventions, [U] not confirmed, check in the real app.
 Sources: https://swinsian.com/ , https://swinsian.com/blog/2017/11/21/whats-new-in-swinsian-2 , https://mac.softpedia.com/get/Audio/Swinsian.shtml
-Describes structure and behavior only. Nothing is copied from the app (no text, logo or icons). WAMP gets its own Winamp-style look.
+Describes structure and behavior only. Nothing is copied from the app (no text, logo or icons). MacAmp gets its own Winamp-style look.
 
 ## 01-main-library
 Page: main library window. Image: https://swinsian.com/image/hero.png
@@ -79,6 +79,6 @@ Menu bar and keyboard shortcuts are not documented in public pages [U]. Known: g
 - Folder (watched), device/AirPlay target, podcast feed and episode [V].
 - Scrobble (Last.fm) [V].
 
-## Dropped from Swinsian for WAMP (decide in user-stories)
+## Dropped from Swinsian for MacAmp (decide in user-stories)
 Podcasts, AirPlay, iOS transfer, Apple Music import, 31-band EQ, desktop widget, AppleScript.
-Added by WAMP: internet radio (Radio Browser), stream recording, Winamp-style skinned window and windowshade mode.
+Added by MacAmp: internet radio (Radio Browser), stream recording, Winamp-style skinned window and windowshade mode.

@@ -1,6 +1,6 @@
 # Market, reviews and features
 
-Research for WAMP (Winamp-style local player with playlists and internet radio for Mac). Done 2026-11-02.
+Research for MacAmp (Winamp-style local player with playlists and internet radio for Mac). Done 2026-11-02.
 [V] verified in a source, [K] from knowledge, [U] unverified, test first.
 
 Evidence is thinner than planned: Reddit was blocked, and no Reddit, Hacker News or Mac App Store review text was found. Several [V] tags rest on search snippets only (marked "snippet").
@@ -17,7 +17,7 @@ Evidence is thinner than planned: Reddit was blocked, and no Reddit, Hacker News
 | Plexamp | Free basic, Plex Pass for more [U] | Mac desktop | Needs a Plex server [K] |
 | Triode (radio) | $19.99 once or $9.99/yr [V](https://www.macstories.net/?p=61609) | Mac | 31 curated stations, search, manual URL, menu bar, global shortcuts, AirPlay 2. Recording not mentioned [V] |
 | Radiola, RadioBar | Free [V snippet](https://www.ifun.de/radiola-10-freier-radioplayer-jetzt-mit-hotkeys-und-export-267856/) | Mac | Menu bar radio |
-| Winamp | No official modern Mac app [U] | | Mac clones: re:AMP (free, 2020), MacWamp (proof of concept) [V snippet]. Check dates |
+| Winamp | No official modern Mac app [U] | | Mac clones: re:AMP (free, 2020), MacMacAmp (proof of concept) [V snippet]. Check dates |
 
 Note: the Reviews track said Vox, Cog and others have no radio [K]. The Market track found Vox sells radio and Cog plays Shoutcast/Icecast streams [V]. Trust the [V] listings.
 
@@ -61,7 +61,7 @@ Patterns:
 | Menu bar control | no | no | yes | yes | yes | Yes |
 
 ## Decisions
-1. Position as "Winamp feel with radio included, no subscription". Because no Mac app combines a skinned Winamp-style UI with free radio; re:AMP and MacWamp look unmaintained [V snippet]. Planned test: check both repos' last commit dates.
+1. Position as "Winamp feel with radio included, no subscription". Because no Mac app combines a skinned Winamp-style UI with free radio; re:AMP and MacMacAmp look unmaintained [V snippet]. Planned test: check both repos' last commit dates.
 2. Radio is free in the core app. Because Vox charges $9.99 for it and Radiola is free [V].
 3. Use Radio Browser as the only directory in v1, plus manual URLs and M3U/PLS import. Because it is free, documented, and returns resolved URLs [V](https://de1.api.radio-browser.info/). Defer SHOUTcast (needs key) and Icecast directory (uncertain).
 4. Own the stream pipeline (URLSession + ICY parser), so titles, EQ, spectrum and recording work on radio. Because Cog-style AVPlayer metadata is inconsistent [K]. Planned test: see platform.md.
