@@ -1,6 +1,6 @@
 import Foundation
 import SwiftData
-import __APP_NAME__Kit
+import WampKit
 
 @Model
 final class Item {

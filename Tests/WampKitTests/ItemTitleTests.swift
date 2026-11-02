@@ -1,5 +1,5 @@
 import Testing
-@testable import __APP_NAME__Kit
+@testable import WampKit
 
 @Test("Clean titles", arguments: [
     ("Buy milk", "Buy milk"),

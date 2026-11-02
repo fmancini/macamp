@@ -1,6 +1,6 @@
 #!/bin/zsh
-# Builds __APP_NAME__ and installs it to ~/Applications/__APP_NAME__.app.
-# Build products live in ~/Library/Developer/__APP_NAME__, outside the repo
+# Builds Wamp and installs it to ~/Applications/Wamp.app.
+# Build products live in ~/Library/Developer/Wamp, outside the repo
 # (and outside Dropbox or iCloud, which would try to sync them).
 #
 # Usage: ./build.sh            release build, install
@@ -8,7 +8,7 @@
 #        ./build.sh --open     install, then quit the running copy and open the new one
 set -euo pipefail
 here=${0:A:h}
-name="__APP_NAME__"
+name="Wamp"
 scratch="$HOME/Library/Developer/$name/build"
 config=release
 [[ " $* " == *" --debug "* ]] && config=debug

@@ -2,22 +2,22 @@ import AppKit
 import SwiftData
 import SwiftUI
 
-// __APP_NAME__
-//   __APP_NAME__                      the app
-//   APP_STORE=<file> __APP_NAME__     use another database (tests, experiments)
-//   APP_SNAPSHOT=<dir> __APP_NAME__   save a PNG of every sidebar page and Settings tab in light and dark mode, then quit
-//   APP_SEED=1 __APP_NAME__           fill an empty /tmp store with sample items (tools/snap.sh)
-//   __APP_NAME__ --selftest           run the self-test on a /tmp store and quit with 0 or 1 (tools/selftest.sh)
-//   APP_ACCENT=<id> __APP_NAME__      run with another accent from Theme.all (UI/Theme.swift)
-//   APP_GRID=1 __APP_NAME__           draw the 8 pt grid and the layout probes over the window
+// Wamp
+//   Wamp                      the app
+//   APP_STORE=<file> Wamp     use another database (tests, experiments)
+//   APP_SNAPSHOT=<dir> Wamp   save a PNG of every sidebar page and Settings tab in light and dark mode, then quit
+//   APP_SEED=1 Wamp           fill an empty /tmp store with sample items (tools/snap.sh)
+//   Wamp --selftest           run the self-test on a /tmp store and quit with 0 or 1 (tools/selftest.sh)
+//   APP_ACCENT=<id> Wamp      run with another accent from Theme.all (UI/Theme.swift)
+//   APP_GRID=1 Wamp           draw the 8 pt grid and the layout probes over the window
 
 @main
-struct __APP_NAME__App: App {
+struct WampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var model = AppModel(container: Store.makeContainer())
 
     var body: some Scene {
-        Window("__APP_NAME__", id: "main") {
+        Window("Wamp", id: "main") {
             ContentView()
                 .environment(model)
                 .themed()
@@ -60,7 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-/// Where the data lives: ~/Library/Application Support/__APP_NAME__/__APP_NAME__.store
+/// Where the data lives: ~/Library/Application Support/Wamp/Wamp.store
 enum Store {
     /// True when APP_STORE points somewhere else (tests, snapshots, seed data).
     static var isOverridden: Bool {
@@ -71,9 +71,9 @@ enum Store {
         if let path = ProcessInfo.processInfo.environment["APP_STORE"], !path.isEmpty {
             return URL(fileURLWithPath: path)
         }
-        let dir = URL.applicationSupportDirectory.appending(path: "__APP_NAME__", directoryHint: .isDirectory)
+        let dir = URL.applicationSupportDirectory.appending(path: "Wamp", directoryHint: .isDirectory)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appending(path: "__APP_NAME__.store")
+        return dir.appending(path: "Wamp.store")
     }
 
     static func makeContainer() -> ModelContainer {

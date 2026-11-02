@@ -3,11 +3,11 @@
 # Usage: tools/snap.sh            all pages
 #        APP_SNAPSHOT_PAGES=all,settings tools/snap.sh
 set -u
-app=~/Applications/__APP_NAME__.app/Contents/MacOS/__APP_NAME__
-store=/tmp/__APP_NAME__-test.store
-shots=/tmp/__APP_NAME__-shots
+app=~/Applications/Wamp.app/Contents/MacOS/Wamp
+store=/tmp/Wamp-test.store
+shots=/tmp/Wamp-shots
 # A crashed run leaves saved window state, and the next launch would wait on a "reopen windows?" alert.
-rm -rf ~/Library/Saved\ Application\ State/__BUNDLE_ID__.savedState
+rm -rf ~/Library/Saved\ Application\ State/com.felipemancini.wamp.savedState
 # Seed data only fills an empty store, so start from nothing.
 rm -f $store $store-shm $store-wal
 rm -rf $shots
