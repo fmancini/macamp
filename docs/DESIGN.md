@@ -27,8 +27,8 @@ Settings tabs: General, Library, Playback, Radio, Shortcuts, Appearance (S-051).
 | Play / Pause | Playback | Space |
 | Stop | Playback | ⌘. |
 | Next / Previous | Playback | ⌘→ / ⌘← |
-| Seek forward / back 5 s | Playback | → / ← (⌥ for 30 s) |
-| Volume up / down | Playback | ↑ / ↓ |
+| Seek forward / back 5 s | Playback | ⌥→ / ⌥← (bare arrows stay free for lists) |
+| Volume up / down | Playback | ⌥↑ / ⌥↓ |
 | Shuffle / Repeat | Playback | ⌘S / ⌘R |
 | Record Station | Playback | ⇧⌘R |
 | Show Equalizer | Window | ⌘E |

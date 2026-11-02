@@ -7,12 +7,13 @@ import SwiftUI
 /// writes <page>-light.png and <page>-dark.png for every sidebar page, and
 /// settings-<tab>-light.png and settings-<tab>-dark.png for every Settings tab, then quits.
 /// Each PNG gets a <page>-<mode>-layout.json with the grid probes (tools/check-layout.swift).
-/// APP_SNAPSHOT_PAGES=all,starred limits the pages. Add "settings" to include Settings.
+/// APP_SNAPSHOT_PAGES=library,queue,player limits the pages. Add "settings" to include Settings.
 /// Add APP_ACCENT=<id> to see the pages in another accent.
 enum Snapshot {
-    static func runIfRequested(model: AppModel, openSettings: OpenSettingsAction) {
+    static func runIfRequested(model: AppModel, player: Player, openSettings: OpenSettingsAction, openWindow: OpenWindowAction) {
         let env = ProcessInfo.processInfo.environment
         guard let dir = env["APP_SNAPSHOT"], !dir.isEmpty else { return }
+        setvbuf(stdout, nil, _IOLBF, 0)
         // Snapshots never run against the real database.
         guard Store.isOverridden else {
             print("SNAPSHOT refused: set APP_STORE to a file in /tmp")
@@ -30,16 +31,32 @@ enum Snapshot {
                                         IOPMAssertionLevel(kIOPMAssertionLevelOn), "Snapshots" as CFString, &awake)
             try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
             try? await Task.sleep(for: .seconds(1.5))
+            openWindow(id: "library")
+            // Show a track part-way through, paused, so the player has content.
+            if let id = player.queue.currentID, player.queue.tracks.count > 1 {
+                player.playTrack(player.queue.tracks[min(2, player.queue.tracks.count - 1)].id)
+                try? await Task.sleep(for: .seconds(0.4))
+                player.seek(to: player.duration * 0.4)
+                player.pause()
+                _ = id
+            }
+            try? await Task.sleep(for: .seconds(0.8))
+            let playerWindow = NSApp.windows.first { $0.title == "Wamp" && $0.canBecomeMain }
+            let library = NSApp.windows.first { $0.canBecomeMain && !$0.isSheet && $0.title != "Wamp"
+                && SidebarItem.allCases.map(\.title).contains($0.title) }
             for mode in ["light", "dark"] {
                 NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
                 for page in SidebarItem.allCases where only?.contains(page.rawValue) ?? true {
                     model.sidebar = page
                     try? await Task.sleep(for: .seconds(0.8))
-                    capture(to: "\(dir)/\(page.rawValue)-\(mode).png")
+                    capture(to: "\(dir)/\(page.rawValue)-\(mode).png", window: library)
+                    if page == SidebarItem.allCases.first, only?.contains("player") ?? true {
+                        capture(to: "\(dir)/player-\(mode).png", window: playerWindow)
+                    }
                 }
             }
             if only == nil || only?.contains("settings") == true {
-                let main = NSApp.windows.first { $0.canBecomeMain && !$0.isSheet }
+                let main = library
                 openSettings()
                 try? await Task.sleep(for: .seconds(1))
                 for mode in ["light", "dark"] {
