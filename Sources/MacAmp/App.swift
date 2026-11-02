@@ -176,7 +176,7 @@ extension Store {
 
     static func makeContainer() -> ModelContainer {
         do {
-            return try ModelContainer(for: LibraryTrack.self, LibraryFolder.self, Playlist.self,
+            return try ModelContainer(for: LibraryTrack.self, LibraryFolder.self, Playlist.self, FavoriteStation.self, PlayedTitle.self,
                                       configurations: ModelConfiguration(url: databaseURL))
         } catch {
             fatalError("Could not open the database at \(databaseURL.path): \(error)")

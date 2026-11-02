@@ -51,3 +51,48 @@ final class Playlist {
         self.items = items
     }
 }
+
+/// A radio station the user saved.
+@Model
+final class FavoriteStation {
+    @Attribute(.unique) var stationID: String
+    var name: String
+    var url: String
+    var codec: String = ""
+    var bitrate: Int = 0
+    var country: String = ""
+    var tags: String = ""
+    var favicon: String = ""
+    var isHLS: Bool = false
+    var addedAt: Date = Date.now
+
+    init(_ station: Station) {
+        stationID = station.id
+        name = station.name
+        url = station.url
+        codec = station.codec
+        bitrate = station.bitrate
+        country = station.country
+        tags = station.tags
+        favicon = station.favicon
+        isHLS = station.isHLS
+    }
+
+    var station: Station {
+        Station(id: stationID, name: name, url: url, codec: codec, bitrate: bitrate, country: country,
+                tags: tags, favicon: favicon, isHLS: isHLS)
+    }
+}
+
+/// A song title heard on a station.
+@Model
+final class PlayedTitle {
+    var stationName: String
+    var title: String
+    var playedAt: Date = Date.now
+
+    init(stationName: String, title: String) {
+        self.stationName = stationName
+        self.title = title
+    }
+}

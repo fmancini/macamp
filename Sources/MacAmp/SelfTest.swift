@@ -149,6 +149,34 @@ enum SelfTest {
             library.deletePlaylist(roadTrip)
             check("a playlist can be deleted", !library.playlists.contains { $0.uuid == roadTrip.uuid })
 
+            // S-020, S-021, S-022 radio (needs the internet; skipped when offline)
+            if let jazz = try? await RadioBrowser.search("jazz", by: .name), !jazz.isEmpty {
+                check("a station search returns stations", jazz.count > 5, "\(jazz.count) results")
+                let candidates = jazz.filter { $0.codec.uppercased() == "MP3" && !$0.isHLS }.prefix(3)
+                var played = false
+                for station in candidates where !played {
+                    played = await tryStation(station, player: player)
+                }
+                check("an MP3 station plays real audio", played, "tried \(candidates.map(\.name))")
+                if let more = try? await RadioBrowser.search("news", by: .name) {
+                    let aacList = more.filter { $0.codec.uppercased().hasPrefix("AAC") && !$0.isHLS }.prefix(3)
+                    var aacPlayed = false
+                    for station in aacList where !aacPlayed { aacPlayed = await tryStation(station, player: player) }
+                    check("an AAC station plays real audio", aacList.isEmpty || aacPlayed, "tried \(aacList.map(\.name))")
+                }
+                if let first = candidates.first {
+                    player.playStation(first)
+                    try? await Task.sleep(for: .seconds(2))
+                    player.stop()
+                    check("Stop disconnects the station and keeps it selected", !player.isPlaying && player.station?.id == first.id)
+                    player.togglePlay()
+                    check("Play reconnects the station", player.isPlaying && player.isLive)
+                    player.stopRadio(clearStation: true)
+                }
+            } else {
+                print("SKIP radio checks: the directory is not reachable")
+            }
+
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark
             check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)
@@ -164,6 +192,23 @@ enum SelfTest {
             print(failures == 0 ? "SELFTEST PASS \(count) checks" : "SELFTEST FAIL \(failures) of \(count) checks")
             finish(code: failures == 0 ? 0 : 1)
         }
+    }
+
+    /// Plays a station and waits for real samples (up to 25 seconds).
+    private static func tryStation(_ station: Station, player: Player) async -> Bool {
+        _ = player.takePeak()
+        player.playStation(station)
+        var waited = 0.0
+        while !player.radioNodeStarted, waited < 25 {
+            try? await Task.sleep(for: .seconds(0.5))
+            waited += 0.5
+        }
+        try? await Task.sleep(for: .seconds(1.5))
+        let peak = player.takePeak()
+        print("  station \(station.name) [\(station.codec)]: started \(player.radioNodeStarted), peak \(peak), title \(player.streamTitle ?? "-")")
+        let ok = player.radioNodeStarted && peak > 0.001
+        player.stopRadio(clearStation: true)
+        return ok
     }
 
     /// A silent WAV, for tests.

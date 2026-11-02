@@ -14,27 +14,43 @@ final class Player {
     private(set) var queue = QueueState() {
         didSet { queueChanged(from: oldValue) }
     }
-    private(set) var isPlaying = false
+    var isPlaying = false
     /// Tracks whose file could not be found or decoded.
     private(set) var unavailable: Set<Track.ID> = []
     /// The last problem, shown inline. nil when there is none.
-    private(set) var message: String?
+    var message: String?
     /// True once the next track is scheduled behind the current one.
     private(set) var nextScheduled = false
 
     var volume: Float {
         didSet {
             engine.mainMixerNode.outputVolume = Store.isOverridden ? 0 : volume
+            avPlayer?.volume = Store.isOverridden ? 0 : volume
             Store.defaults.set(volume, forKey: "player.volume")
         }
     }
     var undoManager: UndoManager?
 
-    private let engine = AVAudioEngine()
-    private let node = AVAudioPlayerNode()
-    private var file: AVAudioFile?
+    // Radio (see Player+Radio.swift)
+    /// The station playing or paused, nil while the Queue plays.
+    var station: Station?
+    /// The song title the stream reports now.
+    var streamTitle: String?
+    /// "Connecting", "Buffering", "Reconnecting (2 of 5)", or nil.
+    var radioStatus: String?
+    var radioStream: RadioStream?
+    var radioGeneration = 0
+    var radioAttempts = 0
+    var radioQueuedSeconds = 0.0
+    var radioNodeStarted = false
+    var avPlayer: AVPlayer?
+    var avMetadata: AVPlayerMetadataBridge?
+
+    let engine = AVAudioEngine()
+    let node = AVAudioPlayerNode()
+    var file: AVAudioFile?
     private var nextFile: AVAudioFile?
-    private var connectedFormat: AVAudioFormat?
+    var connectedFormat: AVAudioFormat?
     /// Frame of `file` where the current segment started (after a seek).
     private var startFrame: AVAudioFramePosition = 0
     /// Samples the node played before the current segment began (gapless hand-offs).
@@ -81,6 +97,7 @@ final class Player {
     }
 
     private func engineConfigurationChanged() {
+        if let station, isPlaying { connectedFormat = nil; playStation(station); return }
         guard file != nil else { return }
         let position = isPlaying ? elapsed : pausedAt
         let wasPlaying = isPlaying
@@ -107,14 +124,19 @@ final class Player {
 
     var current: Track? { queue.current }
     var hasTracks: Bool { !queue.isEmpty }
+    var isLive: Bool { station != nil }
+    /// Play, Pause, and Stop work for the Queue and for a station.
+    var canPlay: Bool { hasTracks || isLive }
 
     var duration: Double {
+        if isLive { return 0 }
         if let file { return Double(file.length) / file.processingFormat.sampleRate }
         return current?.duration ?? 0
     }
 
     /// Seconds into the current track.
     var elapsed: Double {
+        if isLive { return 0 }
         guard let file else { return 0 }
         guard isPlaying else { return pausedAt }
         let rate = file.processingFormat.sampleRate
@@ -265,6 +287,10 @@ final class Player {
     // MARK: Transport
 
     func togglePlay() {
+        if let station {
+            if isPlaying { stopRadio(clearStation: false); isPlaying = false; updateNowPlaying() } else { playStation(station) }
+            return
+        }
         if isPlaying {
             pause()
         } else if file != nil {
@@ -276,6 +302,7 @@ final class Player {
 
     func pause() {
         guard isPlaying else { return }
+        if isLive { stopRadio(clearStation: false); isPlaying = false; updateNowPlaying(); return }
         pausedAt = elapsed
         node.pause()
         isPlaying = false
@@ -291,6 +318,7 @@ final class Player {
     }
 
     func stop() {
+        if isLive { stopRadio(clearStation: false); isPlaying = false; updateNowPlaying(); return }
         stopEngine()
         isPlaying = false
         pausedAt = 0
@@ -302,12 +330,14 @@ final class Player {
 
     /// Next: always moves on, even with Repeat One.
     func next() {
+        guard !isLive else { return }
         guard let id = queue.advance(auto: false) else { stopAtEnd(); return }
         playTrack(id)
     }
 
     /// Previous: restarts the track after 3 seconds, otherwise goes back one.
     func previous() {
+        guard !isLive else { return }
         if elapsed > 3 { seek(to: 0); return }
         if let id = queue.goBack() { playTrack(id) }
     }
@@ -318,6 +348,7 @@ final class Player {
     }
 
     private func beginPlayback(of id: Track.ID, attempts: Int) {
+        stopRadio(clearStation: true)
         stopEngine()
         guard let track = queue.track(id) else { return }
         do {
@@ -382,7 +413,7 @@ final class Player {
 
     // MARK: Engine
 
-    private func connect(format: AVAudioFormat) {
+    func connect(format: AVAudioFormat) {
         guard connectedFormat != format else { return }
         let running = engine.isRunning
         if running { engine.stop() }
@@ -391,13 +422,13 @@ final class Player {
         connectedFormat = format
     }
 
-    private func startEngineIfNeeded() {
+    func startEngineIfNeeded() {
         guard !engine.isRunning else { return }
         engine.prepare()
         do { try engine.start() } catch { message = "Can't start audio output." }
     }
 
-    private func stopEngine() {
+    func stopEngine() {
         generation += 1
         node.stop()
         nextFile = nil
@@ -472,8 +503,16 @@ final class Player {
 
     // MARK: Now Playing and media keys
 
-    private func updateNowPlaying() {
+    func updateNowPlaying() {
         let center = MPNowPlayingInfoCenter.default()
+        if let station {
+            center.nowPlayingInfo = [MPMediaItemPropertyTitle: streamTitle ?? station.name,
+                                     MPMediaItemPropertyArtist: station.name,
+                                     MPNowPlayingInfoPropertyIsLiveStream: true,
+                                     MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0]
+            center.playbackState = isPlaying ? .playing : .paused
+            return
+        }
         guard let track = current else {
             center.nowPlayingInfo = nil
             center.playbackState = .stopped
