@@ -23,3 +23,9 @@ Symptom: the bars looked choppy even though the view drew at 60 fps.
 Cause: an `AVAudioEngine` tap delivers audio in blocks of about 100 ms (4800 frames), whatever `bufferSize` asks for. The FFT ran once per block.
 Fix: a pass-through `AUAudioUnit` (`SpectrumAudioUnit`) copies each render pass (about 470 frames) into a ring buffer; the FFT runs when the view draws. The self-test counts how many of 30 readings, 17 ms apart, change.
 Rule: for anything that must look live, do not use an engine tap; use a render-time unit or compute at draw time.
+
+## The spectrum still looked slow after the audio unit
+Symptom: the bars moved in slow steps. A draw counter (`APP_SPECTRUM_DEBUG=1`) showed the canvas drawing about 4 times a second, not 60.
+Cause: the `Canvas` inside `TimelineView(.animation)` never read the timeline date, so SwiftUI saw an identical drawing and skipped the redraw. It only repainted when the 0.25 s clock of the parent display re-created it.
+Fix: read `timeline.date` in the canvas; spring smoothing (`Spring(duration:bounce:)`, quick rise and slower fall) and peak caps.
+Rule: measure the draw rate before tuning the data path. A Canvas in a TimelineView must use the timeline date.

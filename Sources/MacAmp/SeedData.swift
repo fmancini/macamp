@@ -19,6 +19,10 @@ enum SeedData {
         let names = ["Glass", "Hero", "Submarine", "Funk", "Blow", "Ping", "Sosumi", "Tink"]
         player.open(names.map { sounds.appending(path: "\($0).aiff") }, play: false)
         seedLibrary(from: sounds)
+        if ProcessInfo.processInfo.environment["APP_SPECTRUM_DEBUG"] == "1" {
+            player.cycleRepeat()   // repeat all, so the sounds keep playing
+            if let first = player.queue.currentID { player.playTrack(first) }
+        }
     }
 
     /// Library rows for the system sounds, with made-up tags so the browser,
