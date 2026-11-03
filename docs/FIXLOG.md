@@ -49,3 +49,7 @@ Rule: Measure CPU with a bisect (env switches) before guessing, and give every q
 ## Equalizer drifted away from the player when dragging
 Symptom: dragging the player, the docked equalizer ended up offset or left behind. Cause: the system sets the dragged window from the mouse and ignores our snap correction, so the move delta applied to docked windows included the snap jump and errors added up. Fix: remember each docked window's offset at the start of the drag and place it from the dragged window's final position.
 Rule: Move a group from fixed offsets to the leader, never by accumulating deltas.
+
+## Windowshade mode kept the full window height
+Symptom: collapsing the player left an empty window of the same height. Cause: the player window became resizable (content minimum size), and such a window does not shrink by itself when its content does. Fix: `WindowSnapper.fitHeight` sets the window to the content height on every shade change, top edge fixed, and moves windows docked below.
+Rule: A window that is resizable in one direction needs an explicit resize when its content size changes.

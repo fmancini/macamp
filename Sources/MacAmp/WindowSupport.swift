@@ -60,6 +60,33 @@ final class WindowSnapper {
 
     func window(titled title: String) -> NSWindow? { windows.first { $0.title == title } }
 
+    /// The player changed between full and windowshade: the window takes the height of its
+    /// content again (the top edge stays), and windows docked below it follow.
+    func fitHeight(of window: NSWindow) {
+        guard let content = window.contentView else { return }
+        let target = window.frameRect(forContentRect: NSRect(origin: .zero, size: NSSize(width: window.contentLayoutRect.width, height: content.fittingSize.height))).height
+        let delta = target - window.frame.height
+        guard abs(delta) > 0.5 else { return }
+        // Collect what is stacked under the window before it changes.
+        var below: [NSWindow] = []
+        var frontier = [window]
+        while let upper = frontier.popLast() {
+            for other in windowsDocked(below: upper, except: upper) where !below.contains(other) {
+                below.append(other)
+                frontier.append(other)
+            }
+        }
+        adjusting = true
+        defer { adjusting = false }
+        var frame = window.frame
+        frame.origin.y -= delta
+        frame.size.height = target
+        window.setFrame(frame, display: true, animate: false)
+        for other in below {
+            other.setFrameOrigin(NSPoint(x: other.frame.origin.x, y: other.frame.origin.y - delta))
+        }
+    }
+
     /// Pulls apart every window that touches another one: each moves away from the one it
     /// was docked to, by more than the snap distance, so they stay separate.
     func detachAll() {

@@ -37,6 +37,12 @@ struct PlayerView: View {
         }
         .background(WindowAccessor { WindowSnapper.shared.register($0) })
         .onAppear { player.undoManager = undoManager }
+        .onChange(of: windowState.shade) {
+            // After SwiftUI has laid out the other layout.
+            DispatchQueue.main.async {
+                if let window = WindowSnapper.shared.window(titled: "MacAmp") { WindowSnapper.shared.fitHeight(of: window) }
+            }
+        }
         .task {
             Snapshot.runIfRequested(model: model, player: player, openSettings: openSettings, openWindow: openWindow)
         }
