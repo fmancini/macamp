@@ -43,6 +43,8 @@ final class Player {
     var radioGeneration = 0
     var radioAttempts = 0
     var radioQueuedSeconds = 0.0
+    /// Seconds of radio audio scheduled but not yet played.
+    var radioPendingSeconds = 0.0
     var radioNodeStarted = false
     var avPlayer: AVPlayer?
     var recorder: StreamRecorder?
@@ -293,6 +295,7 @@ final class Player {
 
     private func registerUndo(_ name: String) {
         guard let undoManager else { return }
+        if undoManager.levelsOfUndo == 0 { undoManager.levelsOfUndo = 50 }
         let snapshot = queue
         undoManager.registerUndo(withTarget: self) { player in
             MainActor.assumeIsolated { player.restore(snapshot, name: name) }

@@ -41,3 +41,7 @@ Symptom: after adding a folder, Settings > Library listed nothing, and the Libra
 Cause: the Settings scene had no `modelContainer`, so its `@Query` returned nothing; and the sidebar never listed folders.
 Fix: attach `LibraryModel.shared.container` to the Settings scene; add a Folders section to the sidebar (a page per folder, with Rescan, Show in Finder, Remove) and select the new folder after adding it.
 Rule: every scene that uses `@Query` needs `.modelContainer(...)`; Settings is its own scene.
+
+## Radio could queue audio without limit; playhead cost 19% CPU
+Symptom: playing a track used 20-30% CPU; a fast stream could grow memory. Cause: a 0.25 s TimelineView re-laid out the time label and seek bar; radio buffers were scheduled with no cap. Fix: 0.5 s playhead, 30 s cap on queued radio audio, http/https-only station URLs, mirror suffix check, undo and artwork cache limits, disk-space guard for recording (docs/SECURITY.md).
+Rule: Measure CPU with a bisect (env switches) before guessing, and give every queue that a network can fill a limit.

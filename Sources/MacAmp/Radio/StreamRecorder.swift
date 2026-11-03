@@ -15,6 +15,10 @@ nonisolated final class StreamRecorder: @unchecked Sendable {
     private var currentTitle: String?
     private var files: [URL] = []
     private var bytes = 0
+    private var bytesSinceCheck = 0
+    private var diskFull = false
+    /// Recording stops when the disk has less than this free.
+    private static let minimumFreeBytes: Int64 = 500_000_000
 
     init(folder: URL, stationName: String, fileExtension: String, splitByTitle: Bool, currentTitle: String?) {
         self.folder = folder
@@ -30,6 +34,8 @@ nonisolated final class StreamRecorder: @unchecked Sendable {
     var fileCount: Int { lock.withLock { files.count } }
     var byteCount: Int { lock.withLock { bytes } }
     var savedFiles: [URL] { lock.withLock { files } }
+    /// True when recording stopped because the disk is almost full.
+    var stoppedForSpace: Bool { lock.withLock { diskFull } }
     var currentFileName: String? { lock.withLock { files.last?.lastPathComponent } }
 
     // MARK: Writing
@@ -38,6 +44,14 @@ nonisolated final class StreamRecorder: @unchecked Sendable {
 
     func write(_ data: Data) {
         lock.withLock {
+            if diskFull { return }
+            bytesSinceCheck += data.count
+            if bytesSinceCheck > 4_000_000 || handle == nil {
+                bytesSinceCheck = 0
+                let free = (try? folder.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
+                    .volumeAvailableCapacityForImportantUsage
+                if let free, free < Self.minimumFreeBytes { diskFull = true; closeFile(); return }
+            }
             if handle == nil { openFile(partial: currentTitle != nil && splitByTitle) }
             try? handle?.write(contentsOf: data)
             bytes += data.count

@@ -45,23 +45,28 @@ struct PlayerView: View {
     // MARK: Display
 
     private var display: some View {
-        TimelineView(.periodic(from: .now, by: 0.25)) { _ in
-            VStack(spacing: Space.sm) {
+        VStack(spacing: Space.sm) {
             HStack(alignment: .top, spacing: Space.md) {
-                Text(player.isLive ? String(localized: "LIVE") : Track.clock(shownTime))
-                    .font(.system(size: 28, weight: .medium, design: .monospaced)) // grid: ok
-                    .foregroundStyle(Surface.readout)
-                    .monospacedDigit()
+                // Only the time ticks, and only while playing.
+                Playhead {
+                    Text(player.isLive ? String(localized: "LIVE") : Track.clock(dragging ?? player.elapsed))
+                        .font(.system(size: 28, weight: .medium, design: .monospaced)) // grid: ok
+                        .foregroundStyle(Surface.readout)
+                        .monospacedDigit()
+                }
                 VStack(alignment: .leading, spacing: Space.xs) {
                     Text(titleText)
                         .font(.callout.weight(.medium))
                         .foregroundStyle(Surface.readout)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                    Text(subtitleText)
-                        .font(.caption)
-                        .foregroundStyle(subtitleColor)
-                        .lineLimit(1)
+                    // The recording counter changes without any observable property changing.
+                    TimelineView(.animation(minimumInterval: 1, paused: !player.isRecording)) { _ in
+                        Text(subtitleText)
+                            .font(.caption)
+                            .foregroundStyle(subtitleColor)
+                            .lineLimit(1)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 if let artwork = player.artwork, !player.isLive {
@@ -83,11 +88,10 @@ struct PlayerView: View {
             }
             SpectrumView()
                 .frame(height: 24) // grid: ok
-            }
-            .padding(Space.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Surface.display, in: RoundedRectangle(cornerRadius: Radius.sm, style: .continuous))
         }
+        .padding(Space.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Surface.display, in: RoundedRectangle(cornerRadius: Radius.sm, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 
@@ -118,11 +122,13 @@ struct PlayerView: View {
     // MARK: Seek and volume
 
     private var seekBar: some View {
-        Slider(value: Binding(get: { shownTime }, set: { dragging = $0 }),
-               in: 0...max(player.duration, 1)) { editing in
-            if !editing, let target = dragging {
-                player.seek(to: target)
-                dragging = nil
+        Playhead {
+            Slider(value: Binding(get: { shownTime }, set: { dragging = $0 }),
+                   in: 0...max(player.duration, 1)) { editing in
+                if !editing, let target = dragging {
+                    player.seek(to: target)
+                    dragging = nil
+                }
             }
         }
         .controlSize(.small)
@@ -205,7 +211,7 @@ struct PlayerView: View {
             shadeButton("backward.fill", "Previous", queueOnly: true) { player.previous() }
             shadeButton(player.isPlaying ? "pause.fill" : "play.fill", player.isPlaying ? LocalizedStringKey("Pause") : LocalizedStringKey("Play")) { player.togglePlay() }
             shadeButton("forward.fill", "Next", queueOnly: true) { player.next() }
-            TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+            Playhead {
                 HStack(spacing: Space.sm) {
                     Text(shadeTitle)
                         .font(.caption.weight(.medium))
@@ -242,5 +248,20 @@ struct PlayerView: View {
             .disabled(queueOnly ? !(player.hasTracks && !player.isLive) : !player.canPlay)
             .help(label)
             .accessibilityLabel(label)
+    }
+}
+
+/// Re-reads the playing position about four times a second while a track plays,
+/// and not at all otherwise. (A clock that always runs costs about 15% of a CPU core.)
+private struct Playhead<Content: View>: View {
+    @Environment(Player.self) private var player
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 0.5, paused: !player.isPlaying || player.isLive)) { timeline in
+            // Reading the date makes SwiftUI rebuild the content on every tick.
+            let _ = timeline.date
+            content()
+        }
     }
 }

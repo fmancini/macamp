@@ -25,7 +25,7 @@ nonisolated enum RadioBrowser {
             if let address = current.pointee.ai_addr,
                getnameinfo(address, current.pointee.ai_addrlen, &host, socklen_t(host.count), nil, 0, NI_NAMEREQD) == 0 {
                 let name = String(cString: host)
-                if name.hasSuffix("radio-browser.info"), !names.contains(name) { names.append(name) }
+                if name.hasSuffix(".radio-browser.info"), !names.contains(name) { names.append(name) }
             }
             node = current.pointee.ai_next
         }

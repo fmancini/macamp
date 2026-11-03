@@ -9,6 +9,13 @@ import MacAmpKit
 @MainActor
 enum SeedData {
     static func insertIfRequested(player: Player) {
+        seedManyTracksIfRequested()
+        if let path = ProcessInfo.processInfo.environment["APP_PLAYFILE"], Store.isOverridden {
+            player.open([URL(fileURLWithPath: path)])
+        }
+        if let address = ProcessInfo.processInfo.environment["APP_RADIO"], Store.isOverridden, let url = URL(string: address) {
+            player.playStation(Station(name: "Test station", url: url.absoluteString, codec: "AAC"))
+        }
         guard ProcessInfo.processInfo.environment["APP_SEED"] == "1" else { return }
         guard Store.isOverridden else {
             print("APP_SEED ignored: APP_STORE must be a file in /tmp")
@@ -23,6 +30,28 @@ enum SeedData {
             player.cycleRepeat()   // repeat all, so the sounds keep playing
             if let first = player.queue.currentID { player.playTrack(first) }
         }
+    }
+
+    /// APP_SEED_COUNT=20000 fills the Library with that many made-up tracks, to measure
+    /// memory and speed with a big Library. Test runs only.
+    private static func seedManyTracksIfRequested() {
+        guard let text = ProcessInfo.processInfo.environment["APP_SEED_COUNT"], let count = Int(text), count > 0, Store.isOverridden else { return }
+        let library = LibraryModel.shared
+        guard library.trackCount == 0 else { return }
+        library.context.insert(LibraryFolder(path: "/tmp/macamp-fake"))
+        let genres = ["Rock", "Jazz", "Electronic", "Classical", "Pop", "Folk", "Hip Hop", "Ambient"]
+        for i in 0..<count {
+            let track = LibraryTrack(path: "/tmp/macamp-fake/Artist \(i % 700)/Album \(i % 2_500)/Track \(i).mp3",
+                                     title: "Track number \(i) with a reasonably long title", folderPath: "/tmp/macamp-fake")
+            track.artist = "Artist \(i % 700)"
+            track.album = "Album \(i % 2_500)"
+            track.genre = genres[i % genres.count]
+            track.year = 1970 + i % 55
+            track.trackNumber = i % 14 + 1
+            track.duration = 120 + Double(i % 300)
+            library.context.insert(track)
+        }
+        try? library.context.save()
     }
 
     /// Library rows for the system sounds, with made-up tags so the browser,

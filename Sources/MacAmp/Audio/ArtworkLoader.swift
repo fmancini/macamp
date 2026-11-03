@@ -5,7 +5,11 @@ import MacAmpKit
 /// Album art for a file: the picture inside the tags, or cover.jpg / folder.jpg
 /// (and similar) next to it.
 nonisolated enum ArtworkLoader {
-    nonisolated(unsafe) private static let cache = NSCache<NSString, NSImage>()
+    nonisolated(unsafe) private static let cache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        cache.countLimit = 200
+        return cache
+    }()
     private static let folderNames = ["cover", "folder", "front", "albumart", "album"]
     private static let folderExtensions = ["jpg", "jpeg", "png"]
 

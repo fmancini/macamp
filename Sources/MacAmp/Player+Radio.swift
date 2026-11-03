@@ -15,8 +15,17 @@ extension Player {
         }
     }
 
+    /// Only http and https addresses play. A saved or imported station can't make the
+    /// app open a file: or other scheme.
+    static func streamURL(_ text: String) -> URL? {
+        guard let url = URL(string: text.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme),
+              url.host?.isEmpty == false else { return nil }
+        return url
+    }
+
     func playStation(_ station: Station) {
-        guard let url = URL(string: station.url) else {
+        guard let url = Self.streamURL(station.url) else {
             message = String(localized: "Can't play this address.")
             return
         }
@@ -40,6 +49,7 @@ extension Player {
         radioGeneration += 1
         let generation = radioGeneration
         radioQueuedSeconds = 0
+        radioPendingSeconds = 0
         radioNodeStarted = false
         let stream = RadioStream(url: url) { [weak self] event in
             Task { @MainActor in self?.handle(event, generation: generation) }
@@ -70,6 +80,17 @@ extension Player {
         }
     }
 
+    /// Built outside the main actor: the audio engine calls it on its own thread.
+    private nonisolated static func playedBack(_ player: Player, seconds: Double, generation: Int)
+        -> @Sendable (AVAudioPlayerNodeCompletionCallbackType) -> Void {
+        { [weak player] _ in
+            Task { @MainActor in
+                guard let player, player.radioGeneration == generation else { return }
+                player.radioPendingSeconds = max(0, player.radioPendingSeconds - seconds)
+            }
+        }
+    }
+
     private func handle(_ event: RadioEvent, generation: Int) {
         guard generation == radioGeneration, station != nil else { return }
         switch event {
@@ -80,7 +101,13 @@ extension Player {
             connect(format: format)
             startEngineIfNeeded()
         case .buffer(let buffer):
-            node.scheduleBuffer(buffer, completionHandler: nil)
+            // A stream that arrives faster than real time must not fill memory:
+            // past 30 s of queued audio, extra buffers are dropped.
+            let seconds = Double(buffer.frameLength) / buffer.format.sampleRate
+            if radioPendingSeconds + seconds > 30 { return }
+            radioPendingSeconds += seconds
+            node.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack,
+                                completionHandler: Self.playedBack(self, seconds: seconds, generation: generation))
             radioAttempts = 0
             radioQueuedSeconds += Double(buffer.frameLength) / buffer.format.sampleRate
             if !radioNodeStarted, radioQueuedSeconds >= radioPrebuffer {
@@ -94,7 +121,7 @@ extension Player {
             recordTitle(title)
             updateNowPlaying()
         case .unsupported:
-            if let url = station.flatMap({ URL(string: $0.url) }), let station { startAVPlayer(url, station: station) }
+            if let url = station.flatMap({ Self.streamURL($0.url) }), let station { startAVPlayer(url, station: station) }
         case .ended(let reason):
             reconnect(reason: reason)
         }
@@ -102,7 +129,7 @@ extension Player {
 
     /// Tries again after a dropped connection: up to 5 times, waiting longer each time.
     private func reconnect(reason: String?) {
-        guard let station, isPlaying, let url = URL(string: station.url) else { return }
+        guard let station, isPlaying, let url = Self.streamURL(station.url) else { return }
         radioAttempts += 1
         guard radioAttempts <= 5 else {
             message = String(localized: "Can't reach \"\(station.name)\". Check your connection and press Play.")

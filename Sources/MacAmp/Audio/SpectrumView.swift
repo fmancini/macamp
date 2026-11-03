@@ -6,6 +6,8 @@ struct SpectrumView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var smoother = Smoother()
 
+    /// Read once: `ProcessInfo.environment` builds a dictionary on every call, too slow for 60 draws a second.
+    private static let snapshotMode = ProcessInfo.processInfo.environment["APP_SNAPSHOT"] != nil
     private static let demo: [Float] = (0..<20).map { Float(0.25 + 0.6 * abs(sin(Double($0) * 0.55))) }
 
     var body: some View {
@@ -18,7 +20,7 @@ struct SpectrumView: View {
             Canvas { context, size in
                 _ = now
                 let source: [Float]
-                if ProcessInfo.processInfo.environment["APP_SNAPSHOT"] != nil, player.hasTracks {
+                if Self.snapshotMode, player.hasTracks {
                     source = Self.demo
                 } else {
                     source = live ? player.spectrum.bars : [Float](repeating: 0, count: 20)
@@ -26,18 +28,23 @@ struct SpectrumView: View {
                 if Self.debug { Self.count() }
                 let (levels, peaks) = smoother.update(source, at: now)
                 let count = levels.count
+                let readout = Surface.readout, dim = Surface.readoutDim
                 let gap: CGFloat = 2
                 let width = (size.width - gap * CGFloat(count - 1)) / CGFloat(count)
+                // One path for all bars and one for all caps: two fills per frame, and
+                // the colors are resolved once (resolving a dynamic color is not free).
+                var barsPath = Path(), capsPath = Path()
                 for (index, level) in levels.enumerated() {
                     let height = max(2, size.height * CGFloat(level))
-                    let rect = CGRect(x: CGFloat(index) * (width + gap), y: size.height - height, width: width, height: height)
-                    context.fill(Path(roundedRect: rect, cornerRadius: 1), with: .color(Surface.readout))
+                    let x = CGFloat(index) * (width + gap)
+                    barsPath.addRoundedRect(in: CGRect(x: x, y: size.height - height, width: width, height: height),
+                                            cornerSize: CGSize(width: 1, height: 1))
                     // The peak cap: a thin mark that hangs above the bar and falls slowly.
                     let capY = size.height - max(2, size.height * CGFloat(peaks[index])) - 3
-                    if peaks[index] > 0.04, capY > 0 {
-                        context.fill(Path(CGRect(x: rect.minX, y: capY, width: width, height: 2)), with: .color(Surface.readoutDim))
-                    }
+                    if peaks[index] > 0.04, capY > 0 { capsPath.addRect(CGRect(x: x, y: capY, width: width, height: 2)) }
                 }
+                context.fill(barsPath, with: .color(readout))
+                context.fill(capsPath, with: .color(dim))
             }
         }
         .accessibilityHidden(true)
