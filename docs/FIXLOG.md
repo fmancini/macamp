@@ -35,3 +35,9 @@ Symptom: SIGTRAP (`_dispatch_assert_queue_fail`) in `Player.updateNowPlaying` on
 Cause: the `MPMediaItemArtwork` handler closure was created in main-actor code, but the system calls it from a background queue.
 Fix: create it in a `nonisolated` helper.
 Rule: any closure handed to a system framework that may call it off the main thread must be built in a `nonisolated` context.
+
+## Added music folders were not shown
+Symptom: after adding a folder, Settings > Library listed nothing, and the Library window had no list of folders.
+Cause: the Settings scene had no `modelContainer`, so its `@Query` returned nothing; and the sidebar never listed folders.
+Fix: attach `LibraryModel.shared.container` to the Settings scene; add a Folders section to the sidebar (a page per folder, with Rescan, Show in Finder, Remove) and select the new folder after adding it.
+Rule: every scene that uses `@Query` needs `.modelContainer(...)`; Settings is its own scene.

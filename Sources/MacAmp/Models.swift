@@ -41,6 +41,8 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 enum SidebarSelection: Hashable {
     case page(SidebarItem)
     case playlist(UUID)
+    /// A music folder added to the Library, by path.
+    case folder(String)
 }
 
 /// App-wide state that menus, toolbars, and views share.

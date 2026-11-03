@@ -5,9 +5,16 @@ import MacAmpKit
 /// The Library: a column browser over a sortable table of every track.
 struct LibraryPage: View {
     @Environment(Player.self) private var player
-    @Query(sort: \LibraryTrack.title) private var tracks: [LibraryTrack]
+    /// Only this folder's tracks, or the whole Library when nil.
+    let folder: String?
+    @Query(sort: \LibraryTrack.title) private var allTracks: [LibraryTrack]
     @Query(sort: \Playlist.createdAt) private var playlists: [Playlist]
     private var library = LibraryModel.shared
+    @Environment(AppModel.self) private var model
+
+    init(folder: String? = nil) { self.folder = folder }
+
+    private var tracks: [LibraryTrack] { folder.map { path in allTracks.filter { $0.folderPath == path } } ?? allTracks }
 
     @State private var query = ""
     @State private var sortOrder = [KeyPathComparator(\LibraryTrack.title)]
@@ -64,7 +71,7 @@ struct LibraryPage: View {
                 }
             }
         }
-        .navigationTitle("Library")
+        .navigationTitle(folder.map { URL(fileURLWithPath: $0).lastPathComponent } ?? "Library")
         .navigationSubtitle(tracks.isEmpty ? "" : "\(rows.count) of \(tracks.count) tracks")
         .toolbar { toolbar }
         .sheet(isPresented: $showDuplicates) { DuplicatesSheet() }
@@ -136,7 +143,20 @@ struct LibraryPage: View {
         }
     }
 
+    @ViewBuilder
     private var empty: some View {
+        if folder != nil {
+            ContentUnavailableView {
+                Label(library.isScanning ? "Reading this folder\u{2026}" : "No Music in This Folder", systemImage: "folder")
+            } description: {
+                Text(library.isScanning ? "Tracks appear as they are read." : "MacAmp found no audio files here.")
+            }
+        } else {
+            emptyLibrary
+        }
+    }
+
+    private var emptyLibrary: some View {
         ContentUnavailableView {
             Label("No Music Yet", systemImage: "music.note.house")
         } description: {
@@ -176,7 +196,12 @@ struct LibraryPage: View {
     // MARK: Actions
 
     private func addFolder() {
-        LibraryPanels.chooseFolder { url in Task { await library.addFolder(url) } }
+        LibraryPanels.chooseFolder { url in
+            Task {
+                await library.addFolder(url)
+                model.selection = .folder(url.standardizedFileURL.path)
+            }
+        }
     }
 
     private func play(from id: PersistentIdentifier) {

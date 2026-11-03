@@ -60,6 +60,7 @@ struct MacAmpApp: App {
             SettingsView()
                 .environment(model)
                 .themed()
+                .modelContainer(LibraryModel.shared.container)
         }
         .windowResizability(.contentSize)
     }
@@ -74,7 +75,13 @@ struct MacAmpApp: App {
         }
         CommandGroup(after: .newItem) {
             Button("Add Folder to Library\u{2026}") {
-                LibraryPanels.chooseFolder { url in Task { await LibraryModel.shared.addFolder(url) } }
+                LibraryPanels.chooseFolder { url in
+                    Task {
+                        await LibraryModel.shared.addFolder(url)
+                        model.selection = .folder(url.standardizedFileURL.path)
+                        openWindow(id: "library")
+                    }
+                }
             }
             .keyboardShortcut("o", modifiers: [.command, .shift])
             Button("Import Playlist\u{2026}") {

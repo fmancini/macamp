@@ -1,3 +1,4 @@
+import AppKit
 import SwiftData
 import SwiftUI
 import MacAmpKit
@@ -8,6 +9,7 @@ struct LibraryWindow: View {
     @Environment(Player.self) private var player
     @Environment(\.undoManager) private var undoManager
     @Query(sort: \Playlist.createdAt) private var playlists: [Playlist]
+    @Query(sort: \LibraryFolder.addedAt) private var folders: [LibraryFolder]
     @State private var naming: NameRequest?
     @State private var name = ""
 
@@ -24,6 +26,21 @@ struct LibraryWindow: View {
                 Section {
                     ForEach(SidebarItem.musicPages) { page in
                         Label(page.sidebarTitle, systemImage: page.symbol).tag(SidebarSelection.page(page))
+                    }
+                }
+                if !folders.isEmpty {
+                    Section("Folders") {
+                        ForEach(folders) { folder in
+                            Label(URL(fileURLWithPath: folder.path).lastPathComponent, systemImage: "folder")
+                                .tag(SidebarSelection.folder(folder.path))
+                                .help(folder.path)
+                                .contextMenu {
+                                    Button("Rescan") { Task { await LibraryModel.shared.sync(folder.path) } }
+                                    Button("Show in Finder") { NSWorkspace.shared.open(URL(fileURLWithPath: folder.path)) }
+                                    Divider()
+                                    Button("Remove from Library", role: .destructive) { remove(folder) }
+                                }
+                        }
                     }
                 }
                 Section("Radio") {
@@ -63,6 +80,7 @@ struct LibraryWindow: View {
             case .page(.favorites): FavoritesPage()
             case .page(.history): HistoryPage()
             case .playlist(let id): PlaylistPage(id: id)
+            case .folder(let path): LibraryPage(folder: path)
             }
         }
         .onAppear { player.undoManager = undoManager }
@@ -83,6 +101,11 @@ struct LibraryWindow: View {
             model.selection = .playlist(created.uuid)
         }
         naming = nil
+    }
+
+    private func remove(_ folder: LibraryFolder) {
+        if model.selection == .folder(folder.path) { model.selection = .page(.library) }
+        LibraryModel.shared.removeFolder(folder)
     }
 
     private func delete(_ playlist: Playlist) {

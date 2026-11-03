@@ -94,6 +94,16 @@ enum Snapshot {
                     popover.close()
                 }
             }
+            // A folder page.
+            if only?.contains("folder") ?? true, let folder = LibraryModel.shared.folders.first {
+                for mode in ["light", "dark"] {
+                    NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
+                    model.selection = .folder(folder.path)
+                    try? await Task.sleep(for: .seconds(0.8))
+                    let title = URL(fileURLWithPath: folder.path).lastPathComponent
+                    capture(to: "\(dir)/folder-\(mode).png", window: NSApp.windows.first { $0.canBecomeMain && $0.title == title })
+                }
+            }
             // A playlist page, once per appearance.
             if only?.contains("playlist") ?? true, let playlist = LibraryModel.shared.playlists.first {
                 for mode in ["light", "dark"] {

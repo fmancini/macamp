@@ -157,6 +157,7 @@ enum SelfTest {
             try? Data("notes".utf8).write(to: music.appending(path: "notes.txt"))
             let library = LibraryModel.shared
             await library.addFolder(dir.appending(path: "Music"))
+            check("an added folder is listed", library.folders.map(\.path).contains { $0.hasSuffix("macamp-selftest/Music") })
             check("a scanned folder adds its audio files", library.trackCount == 3, "count \(library.trackCount)")
             let scannedTracks = (try? library.context.fetch(FetchDescriptor<LibraryTrack>())) ?? []
             check("tags and duration are read", scannedTracks.contains { abs($0.duration - 3) < 0.1 })
