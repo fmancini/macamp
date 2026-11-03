@@ -71,6 +71,14 @@ final class WindowSnapper {
 
     /// The equalizer is about to sit under the player: whatever was docked there moves down, under it.
     func makeRoom(below player: NSWindow, for equalizer: NSWindow) {
+        // The equalizer takes the width of the player.
+        if abs(equalizer.frame.width - player.frame.width) > 0.5 {
+            adjusting = true
+            var frame = equalizer.frame
+            frame.size.width = player.frame.width
+            equalizer.setFrame(frame, display: true)
+            adjusting = false
+        }
         for other in windowsDocked(below: player, except: equalizer) {
             other.setFrameOrigin(NSPoint(x: other.frame.origin.x, y: other.frame.origin.y - equalizer.frame.height))
         }
@@ -102,7 +110,17 @@ final class WindowSnapper {
 
     private func willMove(_ window: NSWindow) {
         endDrag()
-        let docked = windows.filter { $0 !== window && $0.isVisible && WindowSnap.areDocked(window.frame, $0.frame) }
+        // Everything connected by touching edges moves, even through other windows
+        // (player, equalizer, then Library).
+        var docked: [NSWindow] = []
+        var frontier = [window]
+        while let current = frontier.popLast() {
+            for other in windows where other !== window && other.isVisible && !docked.contains(other)
+                && WindowSnap.areDocked(current.frame, other.frame) {
+                docked.append(other)
+                frontier.append(other)
+            }
+        }
         for other in docked { window.addChildWindow(other, ordered: .above) }
         group = docked
         dragged = window
