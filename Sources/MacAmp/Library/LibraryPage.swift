@@ -16,6 +16,7 @@ struct LibraryPage: View {
     @State private var artist = ""
     @State private var album = ""
     @State private var showInspector = false
+    @State private var showDuplicates = false
     @SceneStorage("libraryColumns") private var columns: TableColumnCustomization<LibraryTrack>
 
     // MARK: Rows
@@ -57,6 +58,7 @@ struct LibraryPage: View {
         .navigationTitle("Library")
         .navigationSubtitle(tracks.isEmpty ? "" : "\(rows.count) of \(tracks.count) tracks")
         .toolbar { toolbar }
+        .sheet(isPresented: $showDuplicates) { DuplicatesSheet() }
         .onChange(of: genre) { artist = ""; album = "" }
         .onChange(of: artist) { album = "" }
     }
@@ -141,6 +143,11 @@ struct LibraryPage: View {
         ToolbarItem {
             Button("Add Folder\u{2026}", systemImage: "folder.badge.plus") { addFolder() }
                 .help("Add a music folder to the Library (\u{21E7}\u{2318}O)")
+        }
+        ToolbarItem {
+            Button("Find Duplicates\u{2026}", systemImage: "square.on.square") { showDuplicates = true }
+                .help("Find tracks that appear more than once")
+                .disabled(tracks.count < 2)
         }
         ToolbarItem {
             Button("Inspector", systemImage: "sidebar.trailing") { showInspector.toggle() }

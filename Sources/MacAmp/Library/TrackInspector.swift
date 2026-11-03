@@ -1,3 +1,4 @@
+import AppKit
 import MacAmpKit
 import SwiftUI
 
@@ -10,6 +11,7 @@ struct TrackInspector: View {
             ContentUnavailableView("No Selection", systemImage: "sidebar.right")
         } else {
             Form {
+                if tracks.count == 1 { InspectorArtwork(path: tracks[0].path) }
                 Section {
                     field("Title", \.title)
                     field("Artist", \.artist)
@@ -42,5 +44,25 @@ struct TrackInspector: View {
         let values = Set(tracks.map { $0[keyPath: key] })
         let text = values.count == 1 ? (values.first == 0 ? "" : String(values.first ?? 0)) : "Multiple values"
         return LabeledContent(title, value: text)
+    }
+}
+
+/// The album art of one track, if there is any.
+private struct InspectorArtwork: View {
+    let path: String
+    @State private var image: NSImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: 200) // grid: ok
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.sm, style: .continuous))
+                    .accessibilityLabel("Album art")
+            }
+        }
+        .task(id: path) { image = await ArtworkLoader.image(forPath: path) }
     }
 }

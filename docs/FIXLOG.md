@@ -29,3 +29,9 @@ Symptom: the bars moved in slow steps. A draw counter (`APP_SPECTRUM_DEBUG=1`) s
 Cause: the `Canvas` inside `TimelineView(.animation)` never read the timeline date, so SwiftUI saw an identical drawing and skipped the redraw. It only repainted when the 0.25 s clock of the parent display re-created it.
 Fix: read `timeline.date` in the canvas; spring smoothing (`Spring(duration:bounce:)`, quick rise and slower fall) and peak caps.
 Rule: measure the draw rate before tuning the data path. A Canvas in a TimelineView must use the timeline date.
+
+## Crash when a track with a cover started playing
+Symptom: SIGTRAP (`_dispatch_assert_queue_fail`) in `Player.updateNowPlaying` once artwork existed.
+Cause: the `MPMediaItemArtwork` handler closure was created in main-actor code, but the system calls it from a background queue.
+Fix: create it in a `nonisolated` helper.
+Rule: any closure handed to a system framework that may call it off the main thread must be built in a `nonisolated` context.

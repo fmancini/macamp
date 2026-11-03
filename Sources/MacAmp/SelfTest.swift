@@ -15,6 +15,7 @@ enum SelfTest {
     static var exitCode: Int32 = 0
     private static var failures = 0
     private static var count = 0
+    nonisolated(unsafe) private static var activity: NSObjectProtocol?
 
     static func runIfRequested(player: Player) {
         guard requested else { return }
@@ -25,6 +26,8 @@ enum SelfTest {
             finish(code: 1)
             return
         }
+        // Keep App Nap from throttling timers while nothing is on screen.
+        activity = ProcessInfo.processInfo.beginActivity(options: [.userInitiated, .idleSystemSleepDisabled], reason: "Self-test")
         Task {
             try? await Task.sleep(for: .seconds(0.5))
             let dir = URL.cachesDirectory.appending(path: "macamp-selftest", directoryHint: .isDirectory)
@@ -264,6 +267,22 @@ enum SelfTest {
                   "queue \(player.queue.tracks.count), file \(player.file != nil), station \(player.station != nil), message \(player.message ?? "-")")
             GlobalShortcuts.fire(GlobalShortcuts.Action.playPause.rawValue)
             check("the Play / Pause shortcut pauses playback", !player.isPlaying)
+            player.clearQueue()
+
+            // S-043 artwork next to a file, and S-042 ReplayGain without tags
+            let artFolder = dir.appending(path: "Art", directoryHint: .isDirectory)
+            try? FileManager.default.createDirectory(at: artFolder, withIntermediateDirectories: true)
+            let withArt = silence(artFolder.appending(path: "song.wav"), seconds: 2, rate: 44_100)
+            let cover = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 8, pixelsHigh: 8, bitsPerSample: 8, samplesPerPixel: 4,
+                                         hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)
+            try? cover?.representation(using: .png, properties: [:])?.write(to: artFolder.appending(path: "cover.png"))
+            let foundArt = await ArtworkLoader.image(forPath: withArt.path)
+            check("cover.png next to a file is used as its artwork", foundArt != nil)
+            check("a file without any artwork has none", await ArtworkLoader.image(forPath: dir.appending(path: "a.wav").path) == nil)
+            player.open([withArt])
+            try? await Task.sleep(for: .seconds(0.6))
+            check("the player shows the artwork of the current track", player.artwork != nil)
+            check("a track without ReplayGain tags plays at full volume", player.node.volume == 1)
             player.clearQueue()
 
             // S-055 light and dark

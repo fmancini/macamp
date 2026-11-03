@@ -12,6 +12,7 @@ Layers in `Sources/MacAmp`:
 - Audio chain: player node -> `EqualizerModel` (10 bands + preamp, saved) -> mixer (volume). `SpectrumAudioUnit` (a pass-through audio unit after the equalizer) copies each render pass (about 10 ms) into `SpectrumAnalyzer`, which runs the FFT at draw time. The peak tap on the player node and the fallback spectrum tap are `nonisolated` and share data through locks. AVPlayer-fallback streams skip the chain.
 - Windows: player (with a thin windowshade mode), `EqualizerView`, Library window, menu bar popover (`MenuBarPlayer`). `WindowSnapper` docks the player and equalizer (geometry in Kit `WindowSnap`). `GlobalShortcuts` uses Carbon hot keys.
 - Rule: a scene binding must write only when the value changes, or SwiftUI re-evaluates the app in a loop (see `MenuBarSettings`).
+- Recording: `StreamRecorder` writes the stream's raw audio from `RadioStream` (pre-decode), cutting files where `ICYStreamParser.segments` reports a title. Artwork (`ArtworkLoader`) and ReplayGain tags (`ReplayGainReader`) are read through AVFoundation.
 - Test modes: `SelfTest.swift` and `Snapshot.swift`. Both start from `AppDelegate` or the first window and refuse to run without `APP_STORE` in /tmp, which also mutes output and isolates settings (`Store.defaults`).
 
 Dependency direction: views -> Player -> MacAmpKit. Kit never imports the app.

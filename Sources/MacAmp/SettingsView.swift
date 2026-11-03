@@ -23,6 +23,7 @@ struct SettingsView: View {
         Form {
             switch tab {
             case .library: LibrarySettings()
+            case .playback: PlaybackSettings()
             case .radio: RadioSettings()
             case .shortcuts: ShortcutsSettings()
             case .appearance: AppearanceSettings()
@@ -36,13 +37,14 @@ struct SettingsView: View {
 
 /// The Settings tabs. Snapshot mode walks through every case.
 enum SettingsTab: String, CaseIterable, Identifiable {
-    case library, radio, shortcuts, appearance
+    case library, playback, radio, shortcuts, appearance
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
         case .library: "Library"
+        case .playback: "Playback"
         case .radio: "Radio"
         case .shortcuts: "Shortcuts"
         case .appearance: "Appearance"
@@ -52,6 +54,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .library: "music.note.house"
+        case .playback: "play.circle"
         case .radio: "dot.radiowaves.left.and.right"
         case .shortcuts: "keyboard"
         case .appearance: "paintpalette"

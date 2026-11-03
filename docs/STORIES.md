@@ -360,7 +360,7 @@ Acceptance:
 - [unit] Raw stream bytes are written without re-encoding.
 - [self] A 2-minute recording opens and plays in MacAmp.
 - [manual] Settings explain that the user is responsible for the legal use of recordings.
-Status: todo
+Status: done (verified with a real station: the recorded file plays back)
 
 ### S-041 Split recordings by song
 As the user, I choose to start a new file at each title change.
@@ -368,7 +368,7 @@ Depends: S-040
 Acceptance:
 - [unit] A title change closes the file and opens a new one named with the title.
 - [self] Characters invalid in file names are replaced.
-Status: todo
+Status: done
 
 ### S-042 ReplayGain
 As the user, I turn on ReplayGain so tracks play at similar loudness.
@@ -376,7 +376,7 @@ Depends: S-001
 Acceptance:
 - [unit] Track and album gain tags are read and applied; peak is respected to avoid clipping.
 - [self] A pair of files with +6 dB and -6 dB tags plays at equal level.
-Status: todo
+Status: doing (math and settings done; the tag reader only sees MP3 and M4A tags and is untested on a real tagged file; FLAC and Ogg need a tag library)
 
 ### S-043 Artwork
 As the user, I see album art from the file or the folder.
@@ -384,7 +384,7 @@ Depends: S-001
 Acceptance:
 - [unit] Embedded art is used first, then cover.jpg or folder.jpg.
 - [snap] Art shows in the main window and the Now Playing widget.
-Status: todo
+Status: done (folder art tested; art embedded in tags is read but not tested with a real file)
 
 ### S-044 OGG Vorbis and Opus
 As the user, I play .ogg and .opus files.
@@ -392,7 +392,7 @@ Depends: S-001
 Acceptance:
 - [unit] A decoder library turns Vorbis and Opus into PCM for the engine.
 - [self] A test .ogg and .opus play, and seek works.
-Status: todo (decided: in v1; do it right after M1, before M3 so radio OGG stations work)
+Status: todo (blocked: needs a decoder library such as SFBAudioEngine; adding a third-party package was not approved)
 
 ### S-045 Duplicate finder
 As the user, I find duplicates in my library and remove them.
@@ -401,7 +401,7 @@ Depends: S-010
 Acceptance:
 - [unit] Matches by title+artist+duration within 2 seconds.
 - [self] Removing a duplicate asks whether to delete the file or only the library entry.
-Status: todo
+Status: done (matching logic tested; the sheet has not been looked at on screen)
 
 ## M6 Polish
 

@@ -64,6 +64,14 @@ struct PlayerView: View {
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                if let artwork = player.artwork, !player.isLive {
+                    Image(nsImage: artwork)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 40, height: 40) // grid: ok
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.xs, style: .continuous))
+                        .accessibilityLabel("Album art")
+                }
                 Button { windowState.shade = true } label: {
                     Image(systemName: "rectangle.compress.vertical")
                         .font(.caption)

@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import MediaPlayer
 import Observation
@@ -45,6 +46,9 @@ final class Player {
     var radioNodeStarted = false
     var avPlayer: AVPlayer?
     var recorder: StreamRecorder?
+    /// The picture for the current track, when it has one.
+    var artwork: NSImage?
+    var artworkID: Track.ID?
     /// The files of the last recording, for the "Show in Finder" button.
     var lastRecording: [URL] = []
     var avMetadata: AVPlayerMetadataBridge?
@@ -538,9 +542,53 @@ final class Player {
         }
     }
 
+    /// The system asks for the picture from a background queue, so this closure
+    /// must not be main-actor code.
+    private nonisolated static func mediaArtwork(_ image: NSImage) -> MPMediaItemArtwork {
+        nonisolated(unsafe) let image = image
+        return MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+    }
+
+    /// Loads the art (and the ReplayGain volume) when the current track changes.
+    private func refreshArtwork() {
+        guard station == nil, let track = current else {
+            if artworkID != nil { artworkID = nil; artwork = nil }
+            if station != nil { node.volume = 1 }
+            return
+        }
+        guard artworkID != track.id else { return }
+        artworkID = track.id
+        artwork = nil
+        let id = track.id, path = track.path
+        Task {
+            let image = await ArtworkLoader.image(forPath: path)
+            guard artworkID == id else { return }
+            artwork = image
+            updateNowPlaying()
+        }
+        applyReplayGain(for: track)
+    }
+
+    /// Sets the player volume from the track's ReplayGain tags, per Settings > Playback.
+    private func applyReplayGain(for track: Track) {
+        let mode = ReplayGain.Mode(rawValue: Store.defaults.string(forKey: "replaygain.mode") ?? "track") ?? .track
+        guard mode != .off else { node.volume = 1; return }
+        let preamp = Store.defaults.double(forKey: "replaygain.preamp")
+        let limit = Store.defaults.object(forKey: "replaygain.limit") as? Bool ?? true
+        let id = track.id, url = track.url
+        Task {
+            let tags = await ReplayGainReader.read(url)
+            guard artworkID == id else { return }
+            let gain = mode == .album ? (tags.albumGain ?? tags.trackGain) : (tags.trackGain ?? tags.albumGain)
+            let peak = mode == .album ? (tags.albumPeak ?? tags.trackPeak) : tags.trackPeak
+            node.volume = ReplayGain.volume(gain: gain, preamp: preamp, peak: peak, preventClipping: limit)
+        }
+    }
+
     // MARK: Now Playing and media keys
 
     func updateNowPlaying() {
+        refreshArtwork()
         let center = MPNowPlayingInfoCenter.default()
         if let station {
             center.nowPlayingInfo = [MPMediaItemPropertyTitle: streamTitle ?? station.name,
@@ -562,6 +610,9 @@ final class Player {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: elapsed,
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
         ]
+        if let artwork {
+            center.nowPlayingInfo?[MPMediaItemPropertyArtwork] = Self.mediaArtwork(artwork)
+        }
         center.playbackState = isPlaying ? .playing : (file == nil ? .stopped : .paused)
     }
 
