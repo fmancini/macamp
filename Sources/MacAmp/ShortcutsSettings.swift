@@ -38,8 +38,10 @@ struct ShortcutRecorder: View {
             else if shortcuts.conflicts.contains(action.rawValue) {
                 Text("In use by another app").font(.caption).foregroundStyle(Surface.warning)
             }
-            Button(recording ? "Press keys\u{2026}" : (shortcuts.combo(for: action)?.display ?? "Record Shortcut")) {
+            Button {
                 recording ? stop() : start()
+            } label: {
+                if recording { Text("Press keys\u{2026}") } else if let display = shortcuts.combo(for: action)?.display { Text(display) } else { Text("Record Shortcut") }
             }
             .help("Click, then press the keys you want. Escape cancels.")
             .accessibilityLabel("\(action.title) shortcut")
@@ -61,7 +63,7 @@ struct ShortcutRecorder: View {
             if event.keyCode == 53 { stop(); return nil }
             let combo = KeyCombo(keyCode: UInt32(event.keyCode), modifiers: GlobalShortcuts.carbonModifiers(event.modifierFlags))
             guard combo.isValidGlobal else {
-                hint = "Add \u{2318}, \u{2325}, or \u{2303}"
+                hint = String(localized: "Add \u{2318}, \u{2325}, or \u{2303}")
                 return nil
             }
             shortcuts.set(combo, for: action)

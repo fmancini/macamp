@@ -44,7 +44,7 @@ enum Snapshot {
             try? await Task.sleep(for: .seconds(0.8))
             let playerWindow = NSApp.windows.first { $0.title == "MacAmp" && $0.canBecomeMain }
             let library = NSApp.windows.first { $0.canBecomeMain && !$0.isSheet && $0.title != "MacAmp"
-                && SidebarItem.allCases.map(\.title).contains($0.title) }
+                && (SidebarItem.allCases.map(\.title) + ["Library"]).contains($0.title) }
             for mode in ["light", "dark"] {
                 NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
                 for page in SidebarItem.allCases where only?.contains(page.rawValue) ?? true {
@@ -61,7 +61,7 @@ enum Snapshot {
             if only?.contains("player") ?? true {
                 openWindow(id: "equalizer")
                 try? await Task.sleep(for: .seconds(1))
-                let equalizer = NSApp.windows.first { $0.title == "Equalizer" }
+                let equalizer = NSApp.windows.first { $0.title == String(localized: "Equalizer") }
                 player.equalizer.state.apply(EqualizerPreset.all[1])
                 for mode in ["light", "dark"] {
                     NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)

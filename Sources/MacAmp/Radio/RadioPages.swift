@@ -27,10 +27,10 @@ struct RadioPage: View {
             if let id = ids.first, let station = results.first(where: { $0.id == id }) { player.playStation(station) }
         }
         .overlay { state }
-        .searchable(text: $query, prompt: "Search \(field.title)")
+        .searchable(text: $query, prompt: "Search \(field.title.lowercased())")
         .task(id: "\(field.rawValue):\(query)") { await search() }
         .navigationTitle("Radio")
-        .navigationSubtitle(results.isEmpty ? "" : "\(results.count) stations")
+        .navigationSubtitle(results.isEmpty ? Text("") : Text("\(results.count) stations"))
         .toolbar {
             ToolbarItem {
                 Picker("Search by", selection: $field) {
@@ -118,7 +118,7 @@ struct FavoritesPage: View {
             }
         }
         .navigationTitle("Favorites")
-        .navigationSubtitle(favorites.isEmpty ? "" : "\(favorites.count) stations")
+        .navigationSubtitle(favorites.isEmpty ? Text("") : Text("\(favorites.count) stations"))
         .toolbar {
             ToolbarItem {
                 Button("Add Station\u{2026}", systemImage: "plus") { adding = true }
@@ -170,7 +170,7 @@ struct AddStationSheet: View {
         working = true
         defer { working = false }
         guard let resolved = await StreamResolver.resolve(address) else {
-            error = "Can't play this address. Use an http or https stream, or a .pls or .m3u link."
+            error = String(localized: "Can't play this address. Use an http or https stream, or a .pls or .m3u link.")
             return
         }
         let title = name.split(whereSeparator: \.isWhitespace).joined(separator: " ")
@@ -206,7 +206,7 @@ struct HistoryPage: View {
             }
         }
         .navigationTitle("History")
-        .navigationSubtitle(titles.isEmpty ? "" : "\(titles.count) titles")
+        .navigationSubtitle(titles.isEmpty ? Text("") : Text("\(titles.count) titles"))
         .toolbar {
             ToolbarItem {
                 Button("Export CSV\u{2026}", systemImage: "square.and.arrow.up") { exportCSV() }
@@ -231,7 +231,7 @@ struct HistoryPage: View {
 
     private func exportCSV() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "MacAmp History.csv"
+        panel.nameFieldStringValue = String(localized: "MacAmp History") + ".csv"
         panel.allowedContentTypes = [.commaSeparatedText]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         try? HistoryCSV.make(titles.map { ($0.playedAt, $0.stationName, $0.title) }).write(to: url, atomically: true, encoding: .utf8)

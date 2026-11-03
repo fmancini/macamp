@@ -38,7 +38,7 @@ struct RadioSettings: View {
 
     private func chooseFolder() {
         let panel = NSOpenPanel()
-        panel.title = "Recordings Folder"
+        panel.title = String(localized: "Recordings Folder")
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true

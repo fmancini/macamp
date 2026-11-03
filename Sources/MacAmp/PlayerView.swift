@@ -48,7 +48,7 @@ struct PlayerView: View {
         TimelineView(.periodic(from: .now, by: 0.25)) { _ in
             VStack(spacing: Space.sm) {
             HStack(alignment: .top, spacing: Space.md) {
-                Text(player.isLive ? "LIVE" : Track.clock(shownTime))
+                Text(player.isLive ? String(localized: "LIVE") : Track.clock(shownTime))
                     .font(.system(size: 28, weight: .medium, design: .monospaced)) // grid: ok
                     .foregroundStyle(Surface.readout)
                     .monospacedDigit()
@@ -102,15 +102,15 @@ struct PlayerView: View {
     private var subtitleText: String {
         if let message = player.message { return message }
         if player.isLive {
-            let base = player.radioStatus ?? player.streamTitle ?? (player.isPlaying ? "Live" : "Stopped")
+            let base = player.radioStatus ?? player.streamTitle ?? (player.isPlaying ? String(localized: "Live") : String(localized: "Stopped"))
             if let recorder = player.recorder {
                 let files = recorder.fileCount
-                return "\u{25CF} REC \(files) \(files == 1 ? "file" : "files") \u{2022} \(base)"
+                return String(localized: "\u{25CF} REC \(files) files \u{2022} \(base)")
             }
             return base
         }
-        guard let track = player.current else { return "Drop audio files here, or press \u{2318}O" }
-        return track.artist.isEmpty ? "Total \(Track.clock(player.duration))" : "\(track.artist) \u{2022} \(Track.clock(player.duration))"
+        guard let track = player.current else { return String(localized: "Drop audio files here, or press \u{2318}O") }
+        return track.artist.isEmpty ? String(localized: "Total \(Track.clock(player.duration))") : "\(track.artist) \u{2022} \(Track.clock(player.duration))"
     }
 
     private var subtitleColor: Color { player.message == nil ? Surface.readoutDim : Surface.warning }
@@ -136,8 +136,8 @@ struct PlayerView: View {
         HStack(spacing: Space.sm) {
             transport("backward.fill", "Go to the previous track (\u{2318}\u{2190})", "Previous", queueOnly: true) { player.previous() }
             transport(player.isPlaying ? "pause.fill" : "play.fill",
-                      player.isPlaying ? "Pause (Space)" : "Play (Space)",
-                      player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
+                      player.isPlaying ? LocalizedStringKey("Pause (Space)") : LocalizedStringKey("Play (Space)"),
+                      player.isPlaying ? LocalizedStringKey("Pause") : LocalizedStringKey("Play")) { player.togglePlay() }
             transport("stop.fill", "Stop playback (\u{2318}.)", "Stop") { player.stop() }
             recordButton
             transport("forward.fill", "Go to the next track (\u{2318}\u{2192})", "Next", queueOnly: true) { player.next() }
@@ -168,12 +168,12 @@ struct PlayerView: View {
         }
         .buttonStyle(.borderless)
         .disabled(!player.canRecord && !player.isRecording)
-        .help(player.isRecording ? "Stop recording (\u{21E7}\u{2318}R)"
-              : (player.isLive ? "Record this station (\u{21E7}\u{2318}R)" : "Recording works with radio stations"))
-        .accessibilityLabel(player.isRecording ? "Stop Recording" : "Record Station")
+        .help(player.isRecording ? Text("Stop recording (\u{21E7}\u{2318}R)")
+              : (player.isLive ? Text("Record this station (\u{21E7}\u{2318}R)") : Text("Recording works with radio stations")))
+        .accessibilityLabel(player.isRecording ? Text("Stop Recording") : Text("Record Station"))
     }
 
-    private func transport(_ symbol: String, _ help: String, _ label: String, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
+    private func transport(_ symbol: String, _ help: LocalizedStringKey, _ label: LocalizedStringKey, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
         let enabled = queueOnly ? (player.hasTracks && !player.isLive) : player.canPlay
         return Button(action: action) {
             Image(systemName: symbol)
@@ -185,7 +185,7 @@ struct PlayerView: View {
         .accessibilityLabel(label)
     }
 
-    private func toggle(_ symbol: String, _ help: String, _ label: String, on: Bool, action: @escaping () -> Void) -> some View {
+    private func toggle(_ symbol: String, _ help: LocalizedStringKey, _ label: LocalizedStringKey, on: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .frame(width: 24, height: 24)
@@ -194,7 +194,7 @@ struct PlayerView: View {
         .buttonStyle(.borderless)
         .help(help)
         .accessibilityLabel(label)
-        .accessibilityValue(on ? "On" : "Off")
+        .accessibilityValue(on ? Text("On") : Text("Off"))
     }
 
     // MARK: Windowshade mode
@@ -203,7 +203,7 @@ struct PlayerView: View {
     private var shadeBar: some View {
         HStack(spacing: Space.sm) {
             shadeButton("backward.fill", "Previous", queueOnly: true) { player.previous() }
-            shadeButton(player.isPlaying ? "pause.fill" : "play.fill", player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
+            shadeButton(player.isPlaying ? "pause.fill" : "play.fill", player.isPlaying ? LocalizedStringKey("Pause") : LocalizedStringKey("Play")) { player.togglePlay() }
             shadeButton("forward.fill", "Next", queueOnly: true) { player.next() }
             TimelineView(.periodic(from: .now, by: 0.5)) { _ in
                 HStack(spacing: Space.sm) {
@@ -213,7 +213,7 @@ struct PlayerView: View {
                         .lineLimit(1)
                         .truncationMode(.tail)
                     Spacer(minLength: Space.xs)
-                    Text(player.isLive ? "LIVE" : Track.clock(player.elapsed))
+                    Text(player.isLive ? String(localized: "LIVE") : Track.clock(player.elapsed))
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(Surface.readout)
                         .monospacedDigit()
@@ -236,7 +236,7 @@ struct PlayerView: View {
         return titleText + (player.isLive ? (player.streamTitle.map { " \u{2013} \($0)" } ?? "") : "")
     }
 
-    private func shadeButton(_ symbol: String, _ label: String, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
+    private func shadeButton(_ symbol: String, _ label: LocalizedStringKey, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) { Image(systemName: symbol).frame(width: 20, height: 20) } // grid: ok
             .buttonStyle(.borderless)
             .disabled(queueOnly ? !(player.hasTracks && !player.isLive) : !player.canPlay)

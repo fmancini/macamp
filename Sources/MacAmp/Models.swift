@@ -12,16 +12,16 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     /// The page and window title.
     var title: String {
         switch self {
-        case .library: "Library"
-        case .queue: "Queue"
-        case .radio: "Radio"
-        case .favorites: "Favorites"
-        case .history: "History"
+        case .library: String(localized: "Library")
+        case .queue: String(localized: "Queue")
+        case .radio: String(localized: "Radio")
+        case .favorites: String(localized: "Favorites")
+        case .history: String(localized: "History")
         }
     }
 
     /// The label in the sidebar (Radio is "Browse" under the Radio heading).
-    var sidebarTitle: String { self == .radio ? "Browse" : title }
+    var sidebarTitle: String { self == .radio ? String(localized: "Browse") : title }
 
     var symbol: String {
         switch self {

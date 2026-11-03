@@ -17,7 +17,7 @@ extension Player {
 
     func playStation(_ station: Station) {
         guard let url = URL(string: station.url) else {
-            message = "Can't play this address."
+            message = String(localized: "Can't play this address.")
             return
         }
         stopRadio(clearStation: false)
@@ -29,7 +29,7 @@ extension Player {
         message = nil
         isPlaying = true
         radioAttempts = 0
-        radioStatus = "Connecting\u{2026}"
+        radioStatus = String(localized: "Connecting\u{2026}")
         Task { await RadioBrowser.countClick(station) }
         if station.isHLS { startAVPlayer(url, station: station); return }
         openStream(url)
@@ -74,7 +74,7 @@ extension Player {
         guard generation == radioGeneration, station != nil else { return }
         switch event {
         case .connected:
-            radioStatus = "Buffering\u{2026}"
+            radioStatus = String(localized: "Buffering\u{2026}")
         case .format(let format):
             if connectedFormat != format { node.stop(); radioNodeStarted = false }
             connect(format: format)
@@ -105,13 +105,13 @@ extension Player {
         guard let station, isPlaying, let url = URL(string: station.url) else { return }
         radioAttempts += 1
         guard radioAttempts <= 5 else {
-            message = "Can't reach \"\(station.name)\". Check your connection and press Play."
+            message = String(localized: "Can't reach \"\(station.name)\". Check your connection and press Play.")
             stopRadio(clearStation: false)
             isPlaying = false
             updateNowPlaying()
             return
         }
-        radioStatus = "Reconnecting (\(radioAttempts) of 5)\u{2026}"
+        radioStatus = String(localized: "Reconnecting (\(radioAttempts) of 5)\u{2026}")
         let generation = radioGeneration
         let delay = min(pow(2, Double(radioAttempts - 1)), 16)
         Task {

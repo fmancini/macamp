@@ -52,5 +52,12 @@ public enum RadioBrowserSearch: String, CaseIterable, Identifiable, Sendable {
     case name, country, language, tag
 
     public var id: String { rawValue }
-    public var title: String { rawValue.capitalized }
+    public var title: String {
+        switch self {
+        case .name: String(localized: "Name")
+        case .country: String(localized: "Country")
+        case .language: String(localized: "Language")
+        case .tag: String(localized: "Tag")
+        }
+    }
 }

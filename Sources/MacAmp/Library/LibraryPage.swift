@@ -74,8 +74,8 @@ struct LibraryPage: View {
                 }
             }
         }
-        .navigationTitle(folder.map { URL(fileURLWithPath: $0).lastPathComponent } ?? "Library")
-        .navigationSubtitle(tracks.isEmpty ? "" : "\(rows.count) of \(tracks.count) tracks")
+        .navigationTitle(folder.map { URL(fileURLWithPath: $0).lastPathComponent } ?? String(localized: "Library"))
+        .navigationSubtitle(tracks.isEmpty ? Text("") : Text("\(rows.count) of \(tracks.count) tracks"))
         .toolbar { toolbar }
         .sheet(isPresented: $showDuplicates) { DuplicatesSheet() }
         .confirmationDialog("Remove \(missingCount) Missing Tracks?", isPresented: $confirmMissing) {
@@ -160,9 +160,9 @@ struct LibraryPage: View {
     private var empty: some View {
         if folder != nil {
             ContentUnavailableView {
-                Label(library.isScanning ? "Reading this folder\u{2026}" : "No Music in This Folder", systemImage: "folder")
+                Label(library.isScanning ? LocalizedStringKey("Reading this folder\u{2026}") : LocalizedStringKey("No Music in This Folder"), systemImage: "folder")
             } description: {
-                Text(library.isScanning ? "Tracks appear as they are read." : "MacAmp found no audio files here.")
+                library.isScanning ? Text("Tracks appear as they are read.") : Text("MacAmp found no audio files here.")
             }
         } else {
             emptyLibrary
@@ -188,7 +188,7 @@ struct LibraryPage: View {
         }
         ToolbarItem {
             Button("Remove Missing Tracks\u{2026}", systemImage: "trash.slash") { confirmMissing = true }
-                .help(missingCount == 0 ? "No tracks are missing" : "Remove the \(missingCount) tracks whose files were deleted")
+                .help(missingCount == 0 ? Text("No tracks are missing") : Text("Remove the \(missingCount) tracks whose files were deleted"))
                 .disabled(missingCount == 0)
         }
         ToolbarItem {
@@ -204,7 +204,7 @@ struct LibraryPage: View {
             if library.isScanning {
                 HStack(spacing: Space.sm) {
                     ProgressView().controlSize(.small)
-                    Text(library.total > 0 ? "Scanning \(library.scanned) of \(library.total)" : "Scanning\u{2026}")
+                    (library.total > 0 ? Text("Scanning \(library.scanned) of \(library.total)") : Text("Scanning\u{2026}"))
                         .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                 }
             }

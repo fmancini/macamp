@@ -51,7 +51,7 @@ struct PlaylistPage: View {
             }
         }
         .navigationTitle(playlist.name)
-        .navigationSubtitle(playlist.items.isEmpty ? "" : "\(playlist.items.count) tracks")
+        .navigationSubtitle(playlist.items.isEmpty ? Text("") : Text("\(playlist.items.count) tracks"))
         .toolbar {
             ToolbarItem {
                 Button("Play", systemImage: "play.fill") { play(playlist, from: 0) }

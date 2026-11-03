@@ -32,9 +32,9 @@ public enum RepeatMode: String, Codable, Sendable, CaseIterable {
 
     public var label: String {
         switch self {
-        case .off: "Off"
-        case .all: "All"
-        case .one: "One"
+        case .off: String(localized: "Off")
+        case .all: String(localized: "All")
+        case .one: String(localized: "One")
         }
     }
 

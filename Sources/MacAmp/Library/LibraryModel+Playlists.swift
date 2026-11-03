@@ -12,7 +12,7 @@ extension LibraryModel {
     @discardableResult
     func createPlaylist(name: String, items: [String] = []) -> Playlist {
         let clean = name.split(whereSeparator: \.isWhitespace).joined(separator: " ")
-        let playlist = Playlist(name: clean.isEmpty ? "New Playlist" : clean, items: items)
+        let playlist = Playlist(name: clean.isEmpty ? String(localized: "New Playlist") : clean, items: items)
         context.insert(playlist)
         try? context.save()
         return playlist
@@ -68,25 +68,25 @@ extension UTType {
 enum LibraryPanels {
     static func chooseFolder(_ handle: @escaping (URL) -> Void) {
         let panel = NSOpenPanel()
-        panel.title = "Add Folder to Library"
+        panel.title = String(localized: "Add Folder to Library")
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
-        panel.prompt = "Add"
+        panel.prompt = String(localized: "Add")
         if panel.runModal() == .OK, let url = panel.url { handle(url) }
     }
 
     static func choosePlaylist(_ handle: @escaping (URL) -> Void) {
         let panel = NSOpenPanel()
-        panel.title = "Import Playlist"
+        panel.title = String(localized: "Import Playlist")
         panel.allowedContentTypes = [.m3u, .m3u8, .pls]
-        panel.prompt = "Import"
+        panel.prompt = String(localized: "Import")
         if panel.runModal() == .OK, let url = panel.url { handle(url) }
     }
 
     static func savePlaylist(named name: String, format: UTType, _ handle: @escaping (URL) -> Void) {
         let panel = NSSavePanel()
-        panel.title = "Export Playlist"
+        panel.title = String(localized: "Export Playlist")
         panel.nameFieldStringValue = name + "." + (format == .pls ? "pls" : "m3u")
         panel.allowedContentTypes = [format]
         if panel.runModal() == .OK, let url = panel.url { handle(url) }

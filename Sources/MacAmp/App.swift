@@ -94,13 +94,13 @@ struct MacAmpApp: App {
             }
         }
         CommandMenu("Playback") {
-            Button(player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
+            Button(player.isPlaying ? LocalizedStringKey("Pause") : LocalizedStringKey("Play")) { player.togglePlay() }
                 .keyboardShortcut(.space, modifiers: [])
                 .disabled(!player.canPlay)
             Button("Stop") { player.stop() }
                 .keyboardShortcut(".")
                 .disabled(!player.canPlay)
-            Button(player.isRecording ? "Stop Recording" : "Record Station") { player.toggleRecording() }
+            Button(player.isRecording ? LocalizedStringKey("Stop Recording") : LocalizedStringKey("Record Station")) { player.toggleRecording() }
                 .keyboardShortcut("r", modifiers: [.command, .shift])
                 .disabled(!player.canRecord && !player.isRecording)
             Divider()
@@ -132,7 +132,7 @@ struct MacAmpApp: App {
             Button("Favorites") { model.sidebar = .favorites; openWindow(id: "library") }
             Button("History") { model.sidebar = .history; openWindow(id: "library") }
             Divider()
-            Button(player.isRecording ? "Stop Recording" : "Record Station") { player.toggleRecording() }
+            Button(player.isRecording ? LocalizedStringKey("Stop Recording") : LocalizedStringKey("Record Station")) { player.toggleRecording() }
                 .disabled(!player.canRecord && !player.isRecording)
             Button("Show Recordings in Finder") { NSWorkspace.shared.open(Player.recordingsFolder) }
         }
@@ -141,7 +141,7 @@ struct MacAmpApp: App {
                 .keyboardShortcut("1")
             Button("Show Queue") { model.sidebar = .queue; openWindow(id: "library") }
                 .keyboardShortcut("l")
-            Button(PlayerWindowState.shared.shade ? "Show Full Player" : "Windowshade Mode") {
+            Button(PlayerWindowState.shared.shade ? LocalizedStringKey("Show Full Player") : LocalizedStringKey("Windowshade Mode")) {
                 PlayerWindowState.shared.shade.toggle()
             }
             .keyboardShortcut("m", modifiers: [.command, .option])

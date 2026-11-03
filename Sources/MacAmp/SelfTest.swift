@@ -294,6 +294,18 @@ enum SelfTest {
             check("a track without ReplayGain tags plays at full volume", player.node.volume == 1)
             player.clearQueue()
 
+            // S-054 Spanish
+            if let path = Bundle.main.path(forResource: "es", ofType: "lproj"), let es = Bundle(path: path) {
+                func spanish(_ key: String) -> String { es.localizedString(forKey: key, value: nil, table: nil) }
+                check("the Spanish strings are in the app", spanish("Library") == "Biblioteca" && spanish("Queue") == "Cola"
+                      && spanish("Play") == "Reproducir")
+                let plural = es.localizedString(forKey: "%lld tracks", value: nil, table: nil)
+                check("Spanish counts use the right plural", String.localizedStringWithFormat(plural, 1) == "1 pista"
+                      && String.localizedStringWithFormat(plural, 3) == "3 pistas", plural)
+            } else {
+                check("the Spanish strings are in the app", false, "no es.lproj in the app bundle")
+            }
+
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark
             check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)

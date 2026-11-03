@@ -16,7 +16,7 @@ struct EqualizerView: View {
                     .toggleStyle(.checkbox)
                     .help("Turn the equalizer on or off")
                 Spacer()
-                Menu(eq.state.matchingPreset?.name ?? "Custom") {
+                Menu(eq.state.matchingPreset?.name ?? String(localized: "Custom")) {
                     ForEach(EqualizerPreset.all) { preset in
                         Button(preset.name) { eq.state.apply(preset) }
                     }
@@ -59,7 +59,7 @@ struct EqualizerView: View {
         })
     }
 
-    private func column(title: String, gain: Binding<Float>, name: String) -> some View {
+    private func column(title: String, gain: Binding<Float>, name: LocalizedStringKey) -> some View {
         VStack(spacing: Space.xs) {
             Slider(value: gain, in: EqualizerState.range, step: 0.5)
                 .controlSize(.mini)

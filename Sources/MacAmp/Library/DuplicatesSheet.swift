@@ -23,7 +23,7 @@ struct DuplicatesSheet: View {
                 } else {
                     List {
                         ForEach(groups.indices, id: \.self) { index in
-                            Section("\(groups[index][0].title) \u{2013} \(groups[index][0].artist.isEmpty ? "Unknown Artist" : groups[index][0].artist)") {
+                            Section("\(groups[index][0].title) \u{2013} \(groups[index][0].artist.isEmpty ? String(localized: "Unknown Artist") : groups[index][0].artist)") {
                                 ForEach(groups[index], id: \.path) { track in
                                     Toggle(isOn: Binding(get: { marked.contains(track.path) },
                                                          set: { if $0 { marked.insert(track.path) } else { marked.remove(track.path) } })) {
@@ -44,7 +44,7 @@ struct DuplicatesSheet: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             Divider()
             HStack {
-                Text(marked.isEmpty ? "Tick the copies you want to remove. The first of each group is kept." : "\(marked.count) tracks marked")
+                (marked.isEmpty ? Text("Tick the copies you want to remove. The first of each group is kept.") : Text("\(marked.count) tracks marked"))
                     .font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Button("Done") { dismiss() }.keyboardShortcut(.cancelAction)

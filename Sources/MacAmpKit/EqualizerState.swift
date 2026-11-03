@@ -36,14 +36,14 @@ public struct EqualizerPreset: Identifiable, Equatable, Sendable {
     public let bands: [Float]
 
     public static let all: [EqualizerPreset] = [
-        EqualizerPreset(name: "Flat", preamp: 0, bands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        EqualizerPreset(name: "Rock", preamp: -2, bands: [5, 4, 3, 1, -1, -1, 2, 4, 5, 5]),
-        EqualizerPreset(name: "Pop", preamp: -2, bands: [-1, 2, 4, 5, 3, 0, -1, -1, 2, 3]),
-        EqualizerPreset(name: "Jazz", preamp: -1, bands: [3, 2, 1, 2, -2, -2, 0, 1, 2, 3]),
-        EqualizerPreset(name: "Classical", preamp: 0, bands: [0, 0, 0, 0, 0, 0, -3, -3, -3, -5]),
-        EqualizerPreset(name: "Dance", preamp: -2, bands: [6, 5, 2, 0, 0, -3, -4, -4, 0, 0]),
-        EqualizerPreset(name: "Vocal", preamp: -1, bands: [-2, -3, -3, 1, 4, 4, 3, 1, 0, -1]),
-        EqualizerPreset(name: "Bass Boost", preamp: -3, bands: [7, 6, 5, 3, 1, 0, 0, 0, 0, 0]),
-        EqualizerPreset(name: "Treble Boost", preamp: -3, bands: [0, 0, 0, 0, 0, 1, 3, 5, 6, 7]),
+        EqualizerPreset(name: String(localized: "Flat"), preamp: 0, bands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        EqualizerPreset(name: String(localized: "Rock"), preamp: -2, bands: [5, 4, 3, 1, -1, -1, 2, 4, 5, 5]),
+        EqualizerPreset(name: String(localized: "Pop"), preamp: -2, bands: [-1, 2, 4, 5, 3, 0, -1, -1, 2, 3]),
+        EqualizerPreset(name: String(localized: "Jazz"), preamp: -1, bands: [3, 2, 1, 2, -2, -2, 0, 1, 2, 3]),
+        EqualizerPreset(name: String(localized: "Classical"), preamp: 0, bands: [0, 0, 0, 0, 0, 0, -3, -3, -3, -5]),
+        EqualizerPreset(name: String(localized: "Dance"), preamp: -2, bands: [6, 5, 2, 0, 0, -3, -4, -4, 0, 0]),
+        EqualizerPreset(name: String(localized: "Vocal"), preamp: -1, bands: [-2, -3, -3, 1, 4, 4, 3, 1, 0, -1]),
+        EqualizerPreset(name: String(localized: "Bass Boost"), preamp: -3, bands: [7, 6, 5, 3, 1, 0, 0, 0, 0, 0]),
+        EqualizerPreset(name: String(localized: "Treble Boost"), preamp: -3, bands: [0, 0, 0, 0, 0, 1, 3, 5, 6, 7]),
     ]
 }

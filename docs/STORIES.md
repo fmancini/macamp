@@ -430,7 +430,7 @@ As the user, I use MacAmp in English or Spanish, following the system language.
 Acceptance:
 - [self] Every user-visible string is in a String Catalog with both languages; no hardcoded text.
 - [snap] Main window and Settings in both languages; long Spanish labels do not truncate.
-Status: todo
+Status: done (English and Spanish; Spanish was checked on every page except the sidebar, which the snapshot fallback leaves blank)
 
 ### S-053 Menu bar commands
 As the user, every action has a menu item with a shortcut shown.

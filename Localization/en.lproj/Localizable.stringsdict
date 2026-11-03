@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>%lld tracks</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>%lld track</string>
+      <key>other</key>
+      <string>%lld tracks</string>
+    </dict>
+  </dict>
+  <key>%lld stations</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>%lld station</string>
+      <key>other</key>
+      <string>%lld stations</string>
+    </dict>
+  </dict>
+  <key>%lld titles</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>%lld title</string>
+      <key>other</key>
+      <string>%lld titles</string>
+    </dict>
+  </dict>
+  <key>%lld tracks marked</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>%lld track marked</string>
+      <key>other</key>
+      <string>%lld tracks marked</string>
+    </dict>
+  </dict>
+  <key>%lld tracks. MacAmp watches these folders and picks up new files on its own.</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>%lld track. MacAmp watches these folders and picks up new files on its own.</string>
+      <key>other</key>
+      <string>%lld tracks. MacAmp watches these folders and picks up new files on its own.</string>
+    </dict>
+  </dict>
+  <key>Remove %lld Missing Tracks?</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>Remove %lld Missing Track?</string>
+      <key>other</key>
+      <string>Remove %lld Missing Tracks?</string>
+    </dict>
+  </dict>
+  <key>Remove %lld Tracks from the Queue?</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>Remove %lld Track from the Queue?</string>
+      <key>other</key>
+      <string>Remove %lld Tracks from the Queue?</string>
+    </dict>
+  </dict>
+  <key>Remove %lld Tracks?</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>Remove %lld Track?</string>
+      <key>other</key>
+      <string>Remove %lld Tracks?</string>
+    </dict>
+  </dict>
+  <key>Clear %lld Titles?</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>Clear %lld Title?</string>
+      <key>other</key>
+      <string>Clear %lld Titles?</string>
+    </dict>
+  </dict>
+  <key>Remove the %lld tracks whose files were deleted</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>Remove the %lld track whose file was deleted</string>
+      <key>other</key>
+      <string>Remove the %lld tracks whose files were deleted</string>
+    </dict>
+  </dict>
+  <key>● REC %lld files • %@</key>
+  <dict>
+    <key>NSStringLocalizedFormatKey</key>
+    <string>%#@count@</string>
+    <key>count</key>
+    <dict>
+      <key>NSStringFormatSpecTypeKey</key>
+      <string>NSStringPluralRuleType</string>
+      <key>NSStringFormatValueTypeKey</key>
+      <string>lld</string>
+      <key>one</key>
+      <string>● REC %lld file • %@</string>
+      <key>other</key>
+      <string>● REC %lld files • %@</string>
+    </dict>
+  </dict>
+</dict>
+</plist>

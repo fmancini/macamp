@@ -9,7 +9,7 @@ enum PlayerTheme: String, CaseIterable, Identifiable {
     case mac
 
     var id: String { rawValue }
-    var name: String { self == .classic ? "Classic" : "Mac" }
+    var name: String { self == .classic ? String(localized: "Classic") : String(localized: "Mac") }
 }
 
 /// The chosen player theme, saved in UserDefaults.

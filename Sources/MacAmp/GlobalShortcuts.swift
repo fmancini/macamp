@@ -16,9 +16,9 @@ final class GlobalShortcuts {
 
         var title: String {
             switch self {
-            case .playPause: "Play / Pause"
-            case .next: "Next Track"
-            case .previous: "Previous Track"
+            case .playPause: String(localized: "Play / Pause")
+            case .next: String(localized: "Next Track")
+            case .previous: String(localized: "Previous Track")
             }
         }
 

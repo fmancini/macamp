@@ -47,7 +47,7 @@ struct QueuePage: View {
             }
         }
         .navigationTitle("Queue")
-        .navigationSubtitle(player.queue.isEmpty ? "" : "\(player.queue.tracks.count) tracks")
+        .navigationSubtitle(player.queue.isEmpty ? Text("") : Text("\(player.queue.tracks.count) tracks"))
         .toolbar {
             ToolbarItem {
                 Button("Open Files\u{2026}", systemImage: "plus") { Player.chooseFiles { player.open($0) } }

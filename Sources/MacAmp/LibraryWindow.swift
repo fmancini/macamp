@@ -84,10 +84,10 @@ struct LibraryWindow: View {
             }
         }
         .onAppear { player.undoManager = undoManager }
-        .alert(naming?.renaming == nil ? "New Playlist" : "Rename Playlist", isPresented: Binding(
+        .alert(naming?.renaming == nil ? LocalizedStringKey("New Playlist") : LocalizedStringKey("Rename Playlist"), isPresented: Binding(
             get: { naming != nil }, set: { if !$0 { naming = nil } })) {
             TextField("Name", text: $name)
-            Button(naming?.renaming == nil ? "Create" : "Rename") { commitName() }
+            Button(naming?.renaming == nil ? LocalizedStringKey("Create") : LocalizedStringKey("Rename")) { commitName() }
             Button("Cancel", role: .cancel) {}
         }
     }

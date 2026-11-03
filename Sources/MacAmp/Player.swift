@@ -186,7 +186,7 @@ final class Player {
     func open(_ urls: [URL], play: Bool = true) {
         let files = Self.audioFiles(in: urls)
         guard !files.isEmpty else {
-            message = "No audio files found."
+            message = String(localized: "No audio files found.")
             return
         }
         message = nil
@@ -388,8 +388,9 @@ final class Player {
             file = opened
         } catch {
             unavailable.insert(id)
-            message = "Can't play \"\(track.title)\": " + (FileManager.default.fileExists(atPath: track.path)
-                ? "unsupported format." : "file not found.")
+            message = FileManager.default.fileExists(atPath: track.path)
+                ? String(localized: "Can't play \"\(track.title)\": unsupported format.")
+                : String(localized: "Can't play \"\(track.title)\": file not found.")
             file = nil
             if attempts < queue.tracks.count, let following = queue.advance(auto: true) {
                 beginPlayback(of: following, attempts: attempts + 1)
@@ -466,7 +467,7 @@ final class Player {
     func startEngineIfNeeded() {
         guard !engine.isRunning else { return }
         engine.prepare()
-        do { try engine.start() } catch { message = "Can't start audio output." }
+        do { try engine.start() } catch { message = String(localized: "Can't start audio output.") }
     }
 
     func stopEngine() {

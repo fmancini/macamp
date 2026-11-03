@@ -19,6 +19,7 @@ struct AppearanceSettings: View {
         Section {
             Toggle("Show MacAmp in the menu bar", isOn: $menuBar.visible)
         }
+        LanguageSection()
         Section {
             Picker("Player theme", selection: $player.theme) {
                 ForEach(PlayerTheme.allCases) { Text($0.name).tag($0) }
@@ -88,7 +89,7 @@ private struct AccentPreview: View {
         .background(.background.secondary)
     }
 
-    private func sidebarRow(_ title: String, symbol: String, selected: Bool) -> some View {
+    private func sidebarRow(_ title: LocalizedStringKey, symbol: String, selected: Bool) -> some View {
         Label(title, systemImage: symbol)
             .font(.callout)
             .foregroundStyle(selected ? Palette.onAccent : .primary)
@@ -130,7 +131,7 @@ private struct AccentPreview: View {
         .padding(Space.md)
     }
 
-    private func task(_ title: String, done: Bool, tag: String? = nil) -> some View {
+    private func task(_ title: LocalizedStringKey, done: Bool, tag: LocalizedStringKey? = nil) -> some View {
         HStack(spacing: Space.sm) {
             Image(systemName: done ? "checkmark.circle.fill" : "circle")
                 .foregroundStyle(done ? AnyShapeStyle(.tint) : AnyShapeStyle(.tertiary))

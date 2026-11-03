@@ -43,11 +43,11 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .library: "Library"
-        case .playback: "Playback"
-        case .radio: "Radio"
-        case .shortcuts: "Shortcuts"
-        case .appearance: "Appearance"
+        case .library: String(localized: "Library")
+        case .playback: String(localized: "Playback")
+        case .radio: String(localized: "Radio")
+        case .shortcuts: String(localized: "Shortcuts")
+        case .appearance: String(localized: "Appearance")
         }
     }
 

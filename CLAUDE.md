@@ -52,3 +52,10 @@ The bama plugin has a skill for each step: `mac-design` (design rules),
 ## Git
 
 - Commit after each working change, with a message that says what the user can now do.
+
+## Languages
+
+- English and Spanish. The English text is the key; Spanish is in `Localization/es.lproj/Localizable.strings`, with plurals in `Localizable.stringsdict` (also for English). `build.sh` copies `Localization/*.lproj` into the app.
+- Text from a `String` variable is not translated by SwiftUI. Use `String(localized: "...")`, or `Text("...")`, `Button("...")`, `.help("...")` with a literal. For a choice between two texts use `cond ? Text("a") : Text("b")`.
+- After adding or changing a text, run `python3 tools/strings.py`: it lists texts without a Spanish translation and exits 1.
+- Check a language: `APP_STORE=/tmp/x.store APP_SEED=1 APP_SNAPSHOT=/tmp/shots ~/Applications/MacAmp.app/Contents/MacOS/MacAmp -AppleLanguages "(es)"`.

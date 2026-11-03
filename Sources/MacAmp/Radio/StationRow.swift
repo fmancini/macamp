@@ -24,8 +24,8 @@ struct StationRow: View {
                     .foregroundStyle(isFavorite ? Palette.accentText : .secondary)
             }
             .buttonStyle(.borderless)
-            .help(isFavorite ? "Remove from Favorites" : "Add to Favorites")
-            .accessibilityLabel(isFavorite ? "Remove from Favorites" : "Add to Favorites")
+            .help(isFavorite ? Text("Remove from Favorites") : Text("Add to Favorites"))
+            .accessibilityLabel(isFavorite ? Text("Remove from Favorites") : Text("Add to Favorites"))
         }
         .accessibilityElement(children: .contain)
     }
