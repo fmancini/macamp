@@ -93,7 +93,14 @@ struct PlayerView: View {
 
     private var subtitleText: String {
         if let message = player.message { return message }
-        if player.isLive { return player.radioStatus ?? player.streamTitle ?? (player.isPlaying ? "Live" : "Stopped") }
+        if player.isLive {
+            let base = player.radioStatus ?? player.streamTitle ?? (player.isPlaying ? "Live" : "Stopped")
+            if let recorder = player.recorder {
+                let files = recorder.fileCount
+                return "\u{25CF} REC \(files) \(files == 1 ? "file" : "files") \u{2022} \(base)"
+            }
+            return base
+        }
         guard let track = player.current else { return "Drop audio files here, or press \u{2318}O" }
         return track.artist.isEmpty ? "Total \(Track.clock(player.duration))" : "\(track.artist) \u{2022} \(Track.clock(player.duration))"
     }
@@ -124,6 +131,7 @@ struct PlayerView: View {
                       player.isPlaying ? "Pause (Space)" : "Play (Space)",
                       player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
             transport("stop.fill", "Stop playback (\u{2318}.)", "Stop") { player.stop() }
+            recordButton
             transport("forward.fill", "Go to the next track (\u{2318}\u{2192})", "Next", queueOnly: true) { player.next() }
             Spacer(minLength: Space.sm)
             toggle("shuffle", "Play the Queue in random order (\u{2318}S)", "Shuffle", on: player.queue.shuffle) { player.toggleShuffle() }
@@ -141,6 +149,20 @@ struct PlayerView: View {
                 .accessibilityLabel("Volume")
                 .accessibilityValue("\(Int(player.volume * 100)) percent")
         }
+    }
+
+    /// Record is for stations: it saves the stream to files (Radio settings pick the folder).
+    private var recordButton: some View {
+        Button { player.toggleRecording() } label: {
+            Image(systemName: player.isRecording ? "record.circle.fill" : "record.circle")
+                .frame(width: 24, height: 24)
+                .foregroundStyle(player.isRecording ? Color.red : .primary)
+        }
+        .buttonStyle(.borderless)
+        .disabled(!player.canRecord && !player.isRecording)
+        .help(player.isRecording ? "Stop recording (\u{21E7}\u{2318}R)"
+              : (player.isLive ? "Record this station (\u{21E7}\u{2318}R)" : "Recording works with radio stations"))
+        .accessibilityLabel(player.isRecording ? "Stop Recording" : "Record Station")
     }
 
     private func transport(_ symbol: String, _ help: String, _ label: String, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {

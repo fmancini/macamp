@@ -44,6 +44,9 @@ final class Player {
     var radioQueuedSeconds = 0.0
     var radioNodeStarted = false
     var avPlayer: AVPlayer?
+    var recorder: StreamRecorder?
+    /// The files of the last recording, for the "Show in Finder" button.
+    var lastRecording: [URL] = []
     var avMetadata: AVPlayerMetadataBridge?
 
     let engine = AVAudioEngine()

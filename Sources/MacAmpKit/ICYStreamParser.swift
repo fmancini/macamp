@@ -21,11 +21,19 @@ public struct ICYStreamParser: Sendable {
         state = .audio(remaining: max(0, metaInterval))
     }
 
-    /// Feeds the next chunk of the stream. Chunks may split anywhere.
-    public mutating func feed(_ data: Data) -> (audio: Data, titles: [String]) {
-        guard metaInterval > 0 else { return (data, []) }
+    /// One piece of a chunk, in stream order.
+    public enum Segment: Equatable, Sendable {
+        case audio(Data)
+        case title(String)
+    }
+
+    /// Feeds the next chunk and returns audio and titles in the order they occur,
+    /// so a recorder can cut a file exactly where a title changes.
+    public mutating func segments(_ data: Data) -> [Segment] {
+        guard metaInterval > 0 else { return data.isEmpty ? [] : [.audio(data)] }
+        var result: [Segment] = []
         var audio = Data()
-        var titles: [String] = []
+        func flush() { if !audio.isEmpty { result.append(.audio(audio)); audio = Data() } }
         var index = data.startIndex
         while index < data.endIndex {
             switch state {
@@ -44,11 +52,25 @@ public struct ICYStreamParser: Sendable {
                 block.append(data[index..<(index + take)])
                 index += take
                 if take == remaining {
-                    if let title = Self.title(in: block) { titles.append(title) }
+                    if let title = Self.title(in: block) { flush(); result.append(.title(title)) }
                     state = .audio(remaining: metaInterval)
                 } else {
                     state = .metadata(remaining: remaining - take)
                 }
+            }
+        }
+        flush()
+        return result
+    }
+
+    /// Feeds the next chunk. Chunks may split anywhere. Audio is joined; titles are listed.
+    public mutating func feed(_ data: Data) -> (audio: Data, titles: [String]) {
+        var audio = Data()
+        var titles: [String] = []
+        for segment in segments(data) {
+            switch segment {
+            case .audio(let bytes): audio.append(bytes)
+            case .title(let title): titles.append(title)
             }
         }
         return (audio, titles)

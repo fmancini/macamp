@@ -12,6 +12,10 @@ nonisolated final class RadioStream: NSObject, URLSessionDataDelegate, @unchecke
     private var parser = ICYStreamParser(metaInterval: 0)
     private var decoder: StreamDecoder?
     private var finished = false
+    private let recorderLock = NSLock()
+    private var activeRecorder: StreamRecorder?
+    /// The file extension for what this stream sends (mp3 or aac), once connected.
+    private(set) var fileExtension: String?
 
     init(url: URL, handler: @escaping @Sendable (RadioEvent) -> Void) {
         self.url = url
@@ -27,6 +31,15 @@ nonisolated final class RadioStream: NSObject, URLSessionDataDelegate, @unchecke
         let session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: queue)
         self.session = session
         session.dataTask(with: request).resume()
+    }
+
+    /// Set to start saving this stream, or nil to stop. Safe to call from any thread.
+    var recorder: StreamRecorder? {
+        get { recorderLock.withLock { activeRecorder } }
+        set {
+            recorderLock.withLock { activeRecorder = newValue }
+            if let ext = fileExtension { newValue?.setExtension(ext) }
+        }
     }
 
     func stop() {
@@ -61,6 +74,8 @@ nonisolated final class RadioStream: NSObject, URLSessionDataDelegate, @unchecke
             if !finished { finished = true; handler(.unsupported) }
             return
         }
+        fileExtension = RecordingNames.fileExtension(forContentType: type)
+        if let ext = fileExtension { recorder?.setExtension(ext) }
         parser = ICYStreamParser(metaInterval: Int(headers["icy-metaint"] ?? "") ?? 0)
         decoder = StreamDecoder(fileType: fileType, emit: handler)
         handler(.connected)
@@ -69,9 +84,17 @@ nonisolated final class RadioStream: NSObject, URLSessionDataDelegate, @unchecke
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard !finished else { return }
-        let parts = parser.feed(data)
-        for title in parts.titles { handler(.title(title)) }
-        decoder?.feed(parts.audio)
+        let recorder = self.recorder
+        for segment in parser.segments(data) {
+            switch segment {
+            case .title(let title):
+                recorder?.title(title)
+                handler(.title(title))
+            case .audio(let audio):
+                recorder?.write(audio)
+                decoder?.feed(audio)
+            }
+        }
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {

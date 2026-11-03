@@ -44,12 +44,15 @@ extension Player {
         let stream = RadioStream(url: url) { [weak self] event in
             Task { @MainActor in self?.handle(event, generation: generation) }
         }
+        // A reconnect keeps recording into the same session.
+        stream.recorder = recorder
         radioStream = stream
         stream.start()
     }
 
     /// Stops the stream. With `clearStation` the station is forgotten too.
     func stopRadio(clearStation: Bool) {
+        stopRecording()
         radioGeneration += 1
         radioStream?.stop()
         radioStream = nil
@@ -118,6 +121,39 @@ extension Player {
             openStream(url)
             radioNodeStarted = keepRunning
         }
+    }
+
+    // MARK: Recording
+
+    /// Where recordings go: ~/Music/MacAmp Recordings unless Settings says otherwise.
+    static var recordingsFolder: URL {
+        if let path = Store.defaults.string(forKey: "recording.folder"), !path.isEmpty { return URL(fileURLWithPath: path) }
+        return URL.musicDirectory.appending(path: "MacAmp Recordings", directoryHint: .isDirectory)
+    }
+
+    static var splitsByTitle: Bool { Store.defaults.object(forKey: "recording.split") as? Bool ?? true }
+
+    var isRecording: Bool { recorder != nil }
+
+    /// A station that sends plain MP3 or AAC can be recorded; HLS and AVPlayer streams cannot.
+    var canRecord: Bool { station != nil && isPlaying && radioStream != nil && avPlayer == nil }
+
+    func toggleRecording(folder: URL? = nil) {
+        if isRecording { stopRecording(); return }
+        guard canRecord, let station, let stream = radioStream else { return }
+        let ext = stream.fileExtension ?? (station.codec.uppercased().hasPrefix("AAC") ? "aac" : "mp3")
+        let new = StreamRecorder(folder: folder ?? Self.recordingsFolder, stationName: station.name, fileExtension: ext,
+                                 splitByTitle: Self.splitsByTitle, currentTitle: streamTitle)
+        recorder = new
+        stream.recorder = new
+    }
+
+    func stopRecording() {
+        guard let finished = recorder else { return }
+        radioStream?.recorder = nil
+        finished.finish()
+        recorder = nil
+        lastRecording = finished.savedFiles
     }
 
     // MARK: AVPlayer fallback

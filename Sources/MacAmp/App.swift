@@ -93,6 +93,9 @@ struct MacAmpApp: App {
             Button("Stop") { player.stop() }
                 .keyboardShortcut(".")
                 .disabled(!player.canPlay)
+            Button(player.isRecording ? "Stop Recording" : "Record Station") { player.toggleRecording() }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+                .disabled(!player.canRecord && !player.isRecording)
             Divider()
             Button("Next") { player.next() }
                 .keyboardShortcut(.rightArrow)

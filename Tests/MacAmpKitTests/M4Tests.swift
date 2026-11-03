@@ -61,3 +61,50 @@ import Testing
     #expect(!KeyCombo(keyCode: 0, modifiers: KeyCombo.shift).isValidGlobal)
     #expect(KeyCombo(keyCode: 0, modifiers: KeyCombo.command).isValidGlobal)
 }
+
+// MARK: M5
+
+@Test func segmentsKeepAudioAndTitlesInOrder() {
+    var parser = ICYStreamParser(metaInterval: 4)
+    var data = Data([1, 2, 3, 4])
+    var block = Data("StreamTitle='A';".utf8)
+    block.append(Data(repeating: 0, count: 16 - block.count))
+    data.append(1); data.append(block)
+    data.append(Data([5, 6, 7, 8]))
+    #expect(parser.segments(data) == [.audio(Data([1, 2, 3, 4])), .title("A"), .audio(Data([5, 6, 7, 8]))])
+}
+
+@Test func recordingNamesAreSafe() {
+    #expect(RecordingNames.sanitize("AC/DC: Back in Black?") == "AC-DC- Back in Black-")
+    #expect(RecordingNames.sanitize("..hidden") == "hidden")
+    #expect(RecordingNames.sanitize(String(repeating: "x", count: 300)).count == 120)
+    #expect(RecordingNames.fileExtension(forContentType: "audio/mpeg") == "mp3")
+    #expect(RecordingNames.fileExtension(forContentType: "audio/aacp") == "aac")
+    #expect(RecordingNames.fileExtension(forContentType: "audio/ogg") == nil)
+}
+
+@Test func takenNamesGetANumber() {
+    let folder = URL(fileURLWithPath: "/tmp/rec")
+    let taken: Set<String> = ["/tmp/rec/Song.mp3", "/tmp/rec/Song 2.mp3"]
+    #expect(RecordingNames.unique("Song", ext: "mp3", in: folder, exists: { taken.contains($0.path) }).lastPathComponent == "Song 3.mp3")
+}
+
+@Test func duplicatesMatchOnTagsAndDuration() {
+    let items = [
+        DuplicateFinder.Item(id: "a", title: "Café Song", artist: "The Band", duration: 200),
+        DuplicateFinder.Item(id: "b", title: "cafe  song", artist: "the band", duration: 201.5),
+        DuplicateFinder.Item(id: "c", title: "Café Song", artist: "The Band", duration: 260),
+        DuplicateFinder.Item(id: "d", title: "Other", artist: "The Band", duration: 200),
+    ]
+    #expect(DuplicateFinder.groups(items) == [["a", "b"]])
+}
+
+@Test func replayGainParsesAndLimits() {
+    #expect(ReplayGain.parseGain("-6.54 dB") == -6.54)
+    #expect(ReplayGain.parseGain("+3.2dB") == 3.2)
+    #expect(ReplayGain.parseGain("loud") == nil)
+    #expect(abs(ReplayGain.volume(gain: -6) - 0.5012) < 0.001)
+    #expect(ReplayGain.volume(gain: 6) == 1)
+    #expect(ReplayGain.volume(gain: nil) == 1)
+    #expect(ReplayGain.volume(gain: -1, peak: 1.5) < 0.9)
+}

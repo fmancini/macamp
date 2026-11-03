@@ -185,6 +185,25 @@ enum SelfTest {
             library.deletePlaylist(roadTrip)
             check("a playlist can be deleted", !library.playlists.contains { $0.uuid == roadTrip.uuid })
 
+            // S-040 and S-041 recording, from synthetic stream pieces
+            let recFolder = dir.appending(path: "rec", directoryHint: .isDirectory)
+            let recorder = StreamRecorder(folder: recFolder, stationName: "Test FM", fileExtension: "mp3", splitByTitle: true, currentTitle: nil)
+            let partA = Data(repeating: 0xA1, count: 500), partB = Data(repeating: 0xB2, count: 700), partC = Data(repeating: 0xC3, count: 300)
+            recorder.write(partA)
+            recorder.title("Artist / One")
+            recorder.write(partB)
+            recorder.title("Two")
+            recorder.write(partC)
+            recorder.title("Two")   // the same title again must not cut a file
+            recorder.finish()
+            let recorded = recorder.savedFiles
+            check("a title change starts a new file", recorded.count == 3, "\(recorded.map(\.lastPathComponent))")
+            check("recordings are raw bytes, cut where the title changes",
+                  recorded.count == 3 && (try? Data(contentsOf: recorded[0])) == partA && (try? Data(contentsOf: recorded[1])) == partB
+                  && (try? Data(contentsOf: recorded[2])) == partC)
+            check("file names come from the title and are safe", recorded.count == 3 && recorded[1].lastPathComponent == "Artist - One.mp3"
+                  && recorded[2].lastPathComponent == "Two.mp3")
+
             // S-020, S-021, S-022 radio (needs the internet; skipped when offline)
             if let jazz = try? await RadioBrowser.search("jazz", by: .name), !jazz.isEmpty {
                 check("a station search returns stations", jazz.count > 5, "\(jazz.count) results")
@@ -194,6 +213,27 @@ enum SelfTest {
                     played = await tryStation(station, player: player)
                 }
                 check("an MP3 station plays real audio", played, "tried \(candidates.map(\.name))")
+                // S-040: record a real station for a few seconds, then play the file.
+                if let first = candidates.first {
+                    player.playStation(first)
+                    var waited = 0.0
+                    while !player.radioNodeStarted, waited < 25 { try? await Task.sleep(for: .seconds(0.5)); waited += 0.5 }
+                    player.toggleRecording(folder: dir.appending(path: "live", directoryHint: .isDirectory))
+                    check("Record starts on a playing station", player.isRecording)
+                    try? await Task.sleep(for: .seconds(8))
+                    player.stopRecording()
+                    let files = player.lastRecording
+                    let size = files.compactMap { try? FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int }.reduce(0, +)
+                    check("a recording of a real station has audio in it", size > 40_000, "\(files.count) files, \(size) bytes")
+                    player.stopRadio(clearStation: true)
+                    if let biggest = files.max(by: { ((try? FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int) ?? 0) < ((try? FileManager.default.attributesOfItem(atPath: $1.path)[.size] as? Int) ?? 0) }) {
+                        _ = player.takePeak()
+                        player.open([biggest])
+                        try? await Task.sleep(for: .seconds(1.2))
+                        check("the recorded file plays in MacAmp", player.isPlaying && player.takePeak() > 0.001)
+                        player.clearQueue()
+                    }
+                }
                 if let more = try? await RadioBrowser.search("news", by: .name) {
                     let aacList = more.filter { $0.codec.uppercased().hasPrefix("AAC") && !$0.isHLS }.prefix(3)
                     var aacPlayed = false
