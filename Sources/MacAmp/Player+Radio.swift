@@ -60,6 +60,8 @@ extension Player {
         radioNodeStarted = false
         radioStatus = nil
         if clearStation {
+            // Forgetting a playing station also stops "playing".
+            if station != nil { isPlaying = false }
             station = nil
             streamTitle = nil
         }

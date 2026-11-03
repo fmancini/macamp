@@ -5,6 +5,7 @@ struct AppearanceSettings: View {
     @Bindable private var store = ThemeStore.shared
     @Bindable private var player = PlayerThemeStore.shared
     @Bindable private var mode = AppearanceStore.shared
+    @Bindable private var menuBar = MenuBarSettings.shared
 
     var body: some View {
         Section {
@@ -14,6 +15,9 @@ struct AppearanceSettings: View {
             .pickerStyle(.segmented)
         } footer: {
             Text("System follows the Mac's light or dark setting.")
+        }
+        Section {
+            Toggle("Show MacAmp in the menu bar", isOn: $menuBar.visible)
         }
         Section {
             Picker("Player theme", selection: $player.theme) {

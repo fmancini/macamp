@@ -196,6 +196,19 @@ enum SelfTest {
                 print("SKIP radio checks: the directory is not reachable")
             }
 
+            // S-036 global shortcuts
+            GlobalShortcuts.shared.registerAll(force: true)
+            check("the global shortcuts register without a conflict", GlobalShortcuts.shared.conflicts.isEmpty,
+                  "\(GlobalShortcuts.shared.conflicts)")
+            GlobalShortcuts.shared.unregisterAll()
+            player.open([tone], play: false)
+            GlobalShortcuts.fire(GlobalShortcuts.Action.playPause.rawValue)
+            check("the Play / Pause shortcut starts playback", player.isPlaying,
+                  "queue \(player.queue.tracks.count), file \(player.file != nil), station \(player.station != nil), message \(player.message ?? "-")")
+            GlobalShortcuts.fire(GlobalShortcuts.Action.playPause.rawValue)
+            check("the Play / Pause shortcut pauses playback", !player.isPlaying)
+            player.clearQueue()
+
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark
             check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)

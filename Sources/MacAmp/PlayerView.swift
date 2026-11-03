@@ -12,14 +12,21 @@ struct PlayerView: View {
     @Environment(\.undoManager) private var undoManager
     @State private var dragging: Double?
     private var theme = PlayerThemeStore.shared
+    private var windowState = PlayerWindowState.shared
 
     var body: some View {
-        VStack(spacing: Space.sm) {
-            display
-            seekBar
-            controls
+        Group {
+            if windowState.shade {
+                shadeBar
+            } else {
+                VStack(spacing: Space.sm) {
+                    display
+                    seekBar
+                    controls
+                }
+            }
         }
-        .padding(Space.md)
+        .padding(windowState.shade ? Space.sm : Space.md)
         .frame(width: Layout.playerWidth)
         .background(Surface.playerBody)
         .noInitialFocus()
@@ -27,6 +34,7 @@ struct PlayerView: View {
             player.open(urls)
             return true
         }
+        .background(WindowAccessor { WindowSnapper.shared.register($0) })
         .onAppear { player.undoManager = undoManager }
         .task {
             Snapshot.runIfRequested(model: model, player: player, openSettings: openSettings, openWindow: openWindow)
@@ -38,6 +46,7 @@ struct PlayerView: View {
 
     private var display: some View {
         TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+            VStack(spacing: Space.sm) {
             HStack(alignment: .top, spacing: Space.md) {
                 Text(player.isLive ? "LIVE" : Track.clock(shownTime))
                     .font(.system(size: 28, weight: .medium, design: .monospaced)) // grid: ok
@@ -55,9 +64,20 @@ struct PlayerView: View {
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                Button { windowState.shade = true } label: {
+                    Image(systemName: "rectangle.compress.vertical")
+                        .font(.caption)
+                        .foregroundStyle(Surface.readoutDim)
+                }
+                .buttonStyle(.borderless)
+                .help("Shrink to a thin bar (\u{2325}\u{2318}M)")
+                .accessibilityLabel("Windowshade Mode")
+            }
+            SpectrumView()
+                .frame(height: 24) // grid: ok
             }
             .padding(Space.md)
-            .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading) // grid: ok
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Surface.display, in: RoundedRectangle(cornerRadius: Radius.sm, style: .continuous))
         }
         .accessibilityElement(children: .combine)
@@ -145,5 +165,52 @@ struct PlayerView: View {
         .help(help)
         .accessibilityLabel(label)
         .accessibilityValue(on ? "On" : "Off")
+    }
+
+    // MARK: Windowshade mode
+
+    /// One thin row: transport, what is playing, the time, and a way back.
+    private var shadeBar: some View {
+        HStack(spacing: Space.sm) {
+            shadeButton("backward.fill", "Previous", queueOnly: true) { player.previous() }
+            shadeButton(player.isPlaying ? "pause.fill" : "play.fill", player.isPlaying ? "Pause" : "Play") { player.togglePlay() }
+            shadeButton("forward.fill", "Next", queueOnly: true) { player.next() }
+            TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+                HStack(spacing: Space.sm) {
+                    Text(shadeTitle)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(Surface.readout)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Spacer(minLength: Space.xs)
+                    Text(player.isLive ? "LIVE" : Track.clock(player.elapsed))
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Surface.readout)
+                        .monospacedDigit()
+                }
+                .padding(.horizontal, Space.sm)
+                .frame(maxWidth: .infinity, minHeight: Layout.shadeHeight, alignment: .leading)
+                .background(Surface.display, in: RoundedRectangle(cornerRadius: Radius.xs, style: .continuous))
+            }
+            Button { windowState.shade = false } label: {
+                Image(systemName: "rectangle.expand.vertical").frame(width: 20, height: 20) // grid: ok
+            }
+            .buttonStyle(.borderless)
+            .help("Show the full player (\u{2325}\u{2318}M)")
+            .accessibilityLabel("Show Full Player")
+        }
+    }
+
+    private var shadeTitle: String {
+        guard player.station != nil || player.current != nil else { return "MacAmp" }
+        return titleText + (player.isLive ? (player.streamTitle.map { " \u{2013} \($0)" } ?? "") : "")
+    }
+
+    private func shadeButton(_ symbol: String, _ label: String, queueOnly: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) { Image(systemName: symbol).frame(width: 20, height: 20) } // grid: ok
+            .buttonStyle(.borderless)
+            .disabled(queueOnly ? !(player.hasTracks && !player.isLive) : !player.canPlay)
+            .help(label)
+            .accessibilityLabel(label)
     }
 }

@@ -17,6 +17,7 @@ struct MacAmpApp: App {
     @State private var model = AppModel()
     @State private var player = Player.shared
     @Environment(\.openWindow) private var openWindow
+    private var menuBar = MenuBarSettings.shared
 
     var body: some Scene {
         Window("MacAmp", id: "main") {
@@ -48,6 +49,12 @@ struct MacAmpApp: App {
         .defaultSize(width: 880, height: 560)
         .defaultLaunchBehavior(.presented)
         .windowToolbarStyle(.unified)
+
+        MenuBarExtra("MacAmp", systemImage: "waveform", isInserted: menuBar.binding) {
+            MenuBarPlayer()
+                .environment(player)
+        }
+        .menuBarExtraStyle(.window)
 
         Settings {
             SettingsView()
@@ -115,6 +122,10 @@ struct MacAmpApp: App {
                 .keyboardShortcut("1")
             Button("Show Queue") { model.sidebar = .queue; openWindow(id: "library") }
                 .keyboardShortcut("l")
+            Button(PlayerWindowState.shared.shade ? "Show Full Player" : "Windowshade Mode") {
+                PlayerWindowState.shared.shade.toggle()
+            }
+            .keyboardShortcut("m", modifiers: [.command, .option])
             Button("Show Equalizer") { openWindow(id: "equalizer") }
                 .keyboardShortcut("e")
             Button("Show Radio") { model.sidebar = .radio; openWindow(id: "library") }
@@ -131,6 +142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
         AppearanceStore.shared.apply()
+        GlobalShortcuts.shared.registerAll()
         // Test modes start here, so they do not depend on a window being on screen.
         Task { @MainActor in
             SeedData.insertIfRequested(player: Player.shared)

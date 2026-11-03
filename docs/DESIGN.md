@@ -34,7 +34,7 @@ Settings tabs: General, Library, Playback, Radio, Shortcuts, Appearance (S-051).
 | Show Equalizer | Window | ⌘E |
 | Show Queue | Window | ⌘L |
 | Show Library | Window | ⌘1 |
-| Windowshade Mode | Window | ⌘M-style: ⌥⌘M |
+| Windowshade Mode | Window | ⌥⌘M |
 | Show / hide Sidebar, Inspector | View | system (⌥⌘S, ⌥⌘I) |
 | Find | Edit | ⌘F |
 | Remove from Queue | Edit | Delete |

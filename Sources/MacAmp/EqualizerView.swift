@@ -50,6 +50,13 @@ struct EqualizerView: View {
         .frame(width: Layout.equalizerWidth)
         .background(Surface.playerBody)
         .noInitialFocus()
+        .background(WindowAccessor { window in
+            WindowSnapper.shared.register(window)
+            // First time on screen: dock under the player.
+            if let player = WindowSnapper.shared.window(titled: "MacAmp") {
+                window.setFrameTopLeftPoint(NSPoint(x: player.frame.minX, y: player.frame.minY))
+            }
+        })
     }
 
     private func column(title: String, gain: Binding<Float>, name: String) -> some View {

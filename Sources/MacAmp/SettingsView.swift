@@ -24,6 +24,7 @@ struct SettingsView: View {
             switch tab {
             case .library: LibrarySettings()
             case .radio: RadioSettings()
+            case .shortcuts: ShortcutsSettings()
             case .appearance: AppearanceSettings()
             }
         }
@@ -35,7 +36,7 @@ struct SettingsView: View {
 
 /// The Settings tabs. Snapshot mode walks through every case.
 enum SettingsTab: String, CaseIterable, Identifiable {
-    case library, radio, appearance
+    case library, radio, shortcuts, appearance
 
     var id: String { rawValue }
 
@@ -43,6 +44,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
         switch self {
         case .library: "Library"
         case .radio: "Radio"
+        case .shortcuts: "Shortcuts"
         case .appearance: "Appearance"
         }
     }
@@ -51,6 +53,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
         switch self {
         case .library: "music.note.house"
         case .radio: "dot.radiowaves.left.and.right"
+        case .shortcuts: "keyboard"
         case .appearance: "paintpalette"
         }
     }

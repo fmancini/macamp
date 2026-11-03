@@ -1,5 +1,6 @@
 import AppKit
 import IOKit.pwr_mgt
+import MacAmpKit
 import SwiftUI
 
 /// Screenshot mode for agents.
@@ -54,6 +55,43 @@ enum Snapshot {
                     if page == SidebarItem.allCases.first, only?.contains("player") ?? true {
                         capture(to: "\(dir)/player-\(mode).png", window: playerWindow)
                     }
+                }
+            }
+            // The equalizer, the thin player bar, and the Mac theme.
+            if only?.contains("player") ?? true {
+                openWindow(id: "equalizer")
+                try? await Task.sleep(for: .seconds(1))
+                let equalizer = NSApp.windows.first { $0.title == "Equalizer" }
+                player.equalizer.state.apply(EqualizerPreset.all[1])
+                for mode in ["light", "dark"] {
+                    NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
+                    try? await Task.sleep(for: .seconds(0.6))
+                    capture(to: "\(dir)/equalizer-\(mode).png", window: equalizer)
+                    PlayerWindowState.shared.shade = true
+                    try? await Task.sleep(for: .seconds(0.8))
+                    capture(to: "\(dir)/shade-\(mode).png", window: playerWindow)
+                    PlayerWindowState.shared.shade = false
+                    PlayerThemeStore.shared.theme = .mac
+                    try? await Task.sleep(for: .seconds(0.8))
+                    capture(to: "\(dir)/mac-player-\(mode).png", window: playerWindow)
+                    capture(to: "\(dir)/mac-equalizer-\(mode).png", window: equalizer)
+                    PlayerThemeStore.shared.theme = .classic
+                }
+                player.equalizer.state = EqualizerState()
+            }
+            // The menu bar popover, in a plain window.
+            if only?.contains("player") ?? true {
+                for mode in ["light", "dark"] {
+                    NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
+                    let host = NSHostingController(rootView: MenuBarPlayer().environment(player).themed())
+                    let popover = NSWindow(contentViewController: host)
+                    popover.title = "Menu Bar"
+                    popover.setContentSize(host.view.fittingSize)
+                    popover.center()
+                    popover.makeKeyAndOrderFront(nil)
+                    try? await Task.sleep(for: .seconds(0.8))
+                    capture(to: "\(dir)/menubar-\(mode).png", window: popover)
+                    popover.close()
                 }
             }
             // A playlist page, once per appearance.
