@@ -8,7 +8,7 @@ SwiftData database and no server.
 - `Sources/MacAmp/` the app. `App.swift` has the window, menus, and the database location.
 - `Sources/MacAmpKit/` rules and data logic with no SwiftUI. Tests in `Tests/MacAmpKitTests/`.
 - `Package.swift` a Swift package. There is no Xcode project.
-- `build.sh` builds, signs, and installs `~/Applications/MacAmp.app`.
+- `build.sh` builds, signs, and installs `/Applications/MacAmp.app`.
 - `Icon/AppIcon.icon` the app icon, an Icon Composer file (JSON plus SVG layers). `build.sh` compiles it with `tools/make_icon.sh`; `tools/icon_review.sh` renders every look into one PNG.
 - `docs/` the brief, the screen index, and the user stories, when they exist.
 
@@ -58,5 +58,5 @@ The bama plugin has a skill for each step: `mac-design` (design rules),
 - English and Spanish. The English text is the key; Spanish is in `Localization/es.lproj/Localizable.strings`, with plurals in `Localizable.stringsdict` (also for English). `build.sh` copies `Localization/*.lproj` into the app.
 - Text from a `String` variable is not translated by SwiftUI. Use `String(localized: "...")`, or `Text("...")`, `Button("...")`, `.help("...")` with a literal. For a choice between two texts use `cond ? Text("a") : Text("b")`.
 - After adding or changing a text, run `python3 tools/strings.py`: it lists texts without a Spanish translation and exits 1.
-- Check a language: `APP_STORE=/tmp/x.store APP_SEED=1 APP_SNAPSHOT=/tmp/shots ~/Applications/MacAmp.app/Contents/MacOS/MacAmp -AppleLanguages "(es)"`.
+- Check a language: `APP_STORE=/tmp/x.store APP_SEED=1 APP_SNAPSHOT=/tmp/shots /Applications/MacAmp.app/Contents/MacOS/MacAmp -AppleLanguages "(es)"`.
 - The Help text is `Localization/<lang>.lproj/Help.md` (English and Spanish). When a feature or shortcut changes, update both files.

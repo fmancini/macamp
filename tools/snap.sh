@@ -3,7 +3,7 @@
 # Usage: tools/snap.sh            all pages
 #        APP_SNAPSHOT_PAGES=all,settings tools/snap.sh
 set -u
-app=~/Applications/MacAmp.app/Contents/MacOS/MacAmp
+app=/Applications/MacAmp.app/Contents/MacOS/MacAmp
 store=/tmp/MacAmp-test.store
 shots=/tmp/MacAmp-shots
 # A crashed run leaves saved window state, and the next launch would wait on a "reopen windows?" alert.
