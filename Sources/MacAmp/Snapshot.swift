@@ -79,6 +79,16 @@ enum Snapshot {
                 }
                 player.equalizer.state = EqualizerState()
             }
+            // The About panel with the credits.
+            if only?.contains("player") ?? true {
+                NSApp.orderFrontStandardAboutPanel(nil)
+                try? await Task.sleep(for: .seconds(1))
+                if let about = NSApp.windows.first(where: { $0.isVisible && $0.styleMask.contains(.titled) && $0.frame.width < 500
+                    && $0.title != "MacAmp" && $0.title != String(localized: "Equalizer") && $0.title != "Menu Bar" }) {
+                    capture(to: "\(dir)/about.png", window: about)
+                    about.close()
+                }
+            }
             // The menu bar popover, in a plain window.
             if only?.contains("player") ?? true {
                 for mode in ["light", "dark"] {
