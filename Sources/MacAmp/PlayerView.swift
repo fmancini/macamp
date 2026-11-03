@@ -78,6 +78,14 @@ struct PlayerView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Radius.xs, style: .continuous))
                         .accessibilityLabel("Album art")
                 }
+                Button { WindowSnapper.shared.detachAll() } label: {
+                    Image(systemName: "square.on.square.dashed")
+                        .font(.caption)
+                        .foregroundStyle(Surface.readoutDim)
+                }
+                .buttonStyle(.borderless)
+                .help("Separate the player, equalizer, and Library (\u{2325}\u{2318}D)")
+                .accessibilityLabel("Detach Windows")
                 Button { windowState.shade = true } label: {
                     Image(systemName: "rectangle.compress.vertical")
                         .font(.caption)

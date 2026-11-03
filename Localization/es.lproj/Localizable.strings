@@ -281,6 +281,8 @@
 "Volume" = "Volumen";
 "Volume Down" = "Bajar volumen";
 "Volume Up" = "Subir volumen";
+"Detach Windows" = "Separar ventanas";
+"Separate the player, equalizer, and Library (⌥⌘D)" = "Separa el reproductor, el ecualizador y la Biblioteca (⌥⌘D)";
 "Windowshade Mode" = "Modo barra delgada";
 "Year" = "Año";
 "Yellow" = "Amarillo";

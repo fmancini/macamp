@@ -157,6 +157,8 @@ struct MacAmpApp: App {
                 PlayerWindowState.shared.shade.toggle()
             }
             .keyboardShortcut("m", modifiers: [.command, .option])
+            Button("Detach Windows") { WindowSnapper.shared.detachAll() }
+                .keyboardShortcut("d", modifiers: [.command, .option])
             Button("Show Equalizer") { openWindow(id: "equalizer") }
                 .keyboardShortcut("e")
             Button("Show Radio") { model.sidebar = .radio; openWindow(id: "library") }

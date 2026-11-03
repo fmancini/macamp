@@ -60,6 +60,38 @@ final class WindowSnapper {
 
     func window(titled title: String) -> NSWindow? { windows.first { $0.title == title } }
 
+    /// Pulls apart every window that touches another one: each moves away from the one it
+    /// was docked to, by more than the snap distance, so they stay separate.
+    func detachAll() {
+        let gap: CGFloat = 16 // grid: ok
+        var offsets: [ObjectIdentifier: CGPoint] = [:]
+        var visited: [NSWindow] = []
+        for start in windows where start.isVisible && !visited.contains(start) {
+            var frontier = [start]
+            visited.append(start)
+            offsets[ObjectIdentifier(start)] = .zero
+            while let parent = frontier.popLast() {
+                let base = offsets[ObjectIdentifier(parent)] ?? .zero
+                for other in windows where other.isVisible && !visited.contains(other)
+                    && WindowSnap.areDocked(parent.frame, other.frame) {
+                    var step = CGPoint.zero
+                    let p = parent.frame, o = other.frame
+                    if abs(o.maxY - p.minY) <= 1 { step.y = -gap }
+                    else if abs(p.maxY - o.minY) <= 1 { step.y = gap }
+                    else if abs(o.minX - p.maxX) <= 1 { step.x = gap }
+                    else { step.x = -gap }
+                    offsets[ObjectIdentifier(other)] = CGPoint(x: base.x + step.x, y: base.y + step.y)
+                    visited.append(other)
+                    frontier.append(other)
+                }
+            }
+        }
+        for window in windows {
+            guard let offset = offsets[ObjectIdentifier(window)], offset != .zero else { continue }
+            window.setFrameOrigin(NSPoint(x: window.frame.origin.x + offset.x, y: window.frame.origin.y + offset.y))
+        }
+    }
+
     /// Windows (the Library) docked under `upper`, other than `except`.
     private func windowsDocked(below upper: NSWindow, except: NSWindow) -> [NSWindow] {
         windows.filter {
