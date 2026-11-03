@@ -55,6 +55,7 @@ struct EqualizerView: View {
             WindowSnapper.shared.register(window)
             // First time on screen: dock under the player.
             if let player = WindowSnapper.shared.window(titled: "MacAmp") {
+                WindowSnapper.shared.makeRoom(below: player, for: window)
                 window.setFrameTopLeftPoint(NSPoint(x: player.frame.minX, y: player.frame.minY))
             }
         })

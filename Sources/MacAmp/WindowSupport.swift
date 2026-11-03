@@ -44,7 +44,11 @@ final class WindowSnapper {
             MainActor.assumeIsolated { if let w = box.value { self?.didResize(w) } }
         }
         center.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { if let w = box.value { self?.windows.removeAll { $0 === w } } }
+            MainActor.assumeIsolated {
+                guard let w = box.value else { return }
+                if w.title == "Equalizer" { self?.closeGap(left: w) }
+                self?.windows.removeAll { $0 === w }
+            }
         }
     }
 
@@ -55,6 +59,31 @@ final class WindowSnapper {
     }
 
     func window(titled title: String) -> NSWindow? { windows.first { $0.title == title } }
+
+    /// Windows (the Library) docked under `upper`, other than `except`.
+    private func windowsDocked(below upper: NSWindow, except: NSWindow) -> [NSWindow] {
+        windows.filter {
+            $0 !== upper && $0 !== except && $0.isVisible
+                && abs($0.frame.maxY - upper.frame.minY) <= 1
+                && $0.frame.minX < upper.frame.maxX && $0.frame.maxX > upper.frame.minX
+        }
+    }
+
+    /// The equalizer is about to sit under the player: whatever was docked there moves down, under it.
+    func makeRoom(below player: NSWindow, for equalizer: NSWindow) {
+        for other in windowsDocked(below: player, except: equalizer) {
+            other.setFrameOrigin(NSPoint(x: other.frame.origin.x, y: other.frame.origin.y - equalizer.frame.height))
+        }
+    }
+
+    /// The equalizer closed: whatever was docked under it moves up, under the player.
+    private func closeGap(left equalizer: NSWindow) {
+        // Only when the equalizer sits right under the player.
+        guard let player = window(titled: "MacAmp"), abs(equalizer.frame.maxY - player.frame.minY) <= 1 else { return }
+        for other in windowsDocked(below: equalizer, except: equalizer) {
+            other.setFrameOrigin(NSPoint(x: other.frame.origin.x, y: other.frame.origin.y + equalizer.frame.height))
+        }
+    }
 
     /// Resizing the player or the equalizer gives the other the same width while they are stacked.
     private func didResize(_ window: NSWindow) {
