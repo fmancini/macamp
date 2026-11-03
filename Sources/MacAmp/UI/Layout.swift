@@ -3,10 +3,10 @@ import CoreGraphics
 /// Fixed sizes. All on the 4 pt grid.
 enum Layout {
     /// Main player window width and height.
-    static let playerWidth: CGFloat = 320
+    static let playerWidth: CGFloat = 384
     static let playerHeight: CGFloat = 148
     /// Equalizer window width; the queue window matches the player width.
-    static let equalizerWidth: CGFloat = 320
+    static let equalizerWidth: CGFloat = 384
     /// Windowshade bar height.
     static let shadeHeight: CGFloat = 24
     /// Snap distance when windows meet.

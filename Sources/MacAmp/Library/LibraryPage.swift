@@ -47,14 +47,23 @@ struct LibraryPage: View {
                               albums: counts(\.album, in: byArtist))
                 Divider()
             }
-            table
+            if tracks.isEmpty { empty } else { table }
         }
         .inspector(isPresented: $showInspector) {
             TrackInspector(tracks: selectedTracks)
                 .inspectorColumnWidth(min: 220, ideal: 260, max: 360)
         }
         .searchable(text: $query, prompt: "Search Library")
-        .overlay { if tracks.isEmpty { empty } }
+        .overlay {
+            if !tracks.isEmpty, rows.isEmpty {
+                if query.isEmpty {
+                    ContentUnavailableView("No Matching Tracks", systemImage: "line.3.horizontal.decrease.circle",
+                                           description: Text("Choose All in the Genre, Artist, or Album column to see more."))
+                } else {
+                    ContentUnavailableView.search(text: query)
+                }
+            }
+        }
         .navigationTitle("Library")
         .navigationSubtitle(tracks.isEmpty ? "" : "\(rows.count) of \(tracks.count) tracks")
         .toolbar { toolbar }

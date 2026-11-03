@@ -18,7 +18,7 @@ struct SpectrumView: View {
             Canvas { context, size in
                 _ = now
                 let source: [Float]
-                if ProcessInfo.processInfo.environment["APP_SNAPSHOT"] != nil {
+                if ProcessInfo.processInfo.environment["APP_SNAPSHOT"] != nil, player.hasTracks {
                     source = Self.demo
                 } else {
                     source = live ? player.spectrum.bars : [Float](repeating: 0, count: 20)
@@ -34,7 +34,7 @@ struct SpectrumView: View {
                     context.fill(Path(roundedRect: rect, cornerRadius: 1), with: .color(Surface.readout))
                     // The peak cap: a thin mark that hangs above the bar and falls slowly.
                     let capY = size.height - max(2, size.height * CGFloat(peaks[index])) - 3
-                    if capY > 0 {
+                    if peaks[index] > 0.04, capY > 0 {
                         context.fill(Path(CGRect(x: rect.minX, y: capY, width: width, height: 2)), with: .color(Surface.readoutDim))
                     }
                 }

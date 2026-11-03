@@ -30,12 +30,13 @@ Own look, Winamp-inspired (compact, dense, spectrum in the main window), two bui
 
 ## Decisions
 - Price: free, no ads, no subscription. Radio included (decided by the user).
-- OGG Vorbis and Opus: in version one with a decoder library (decided by the user). Story S-044 moves to M1-M2 priority.
+- OGG Vorbis and Opus: dropped. The project uses no third-party code, and AVFoundation cannot decode them (changed by the user after the first decision). Story S-044 moves to M1-M2 priority.
 - Languages: English and Spanish (decided by the user).
 - Engine: AVAudioEngine for files; own URLSession plus ICY reader for radio, so EQ, spectrum and recording work on streams (decided by the agent from research).
 
 ## Not in version one
 - `.wsz` skin compatibility and MilkDrop plugins.
+- Tag editing (needs a tag-writing library) and Ogg/Opus playback.
 - Smart playlists, art grid, find and replace, cue sheets, 31-band EQ.
 - Podcasts, AirPlay, Last.fm, iOS companion, Apple Music import, sync.
 - SHOUTcast and Icecast directories (Radio Browser only).

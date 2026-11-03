@@ -26,7 +26,7 @@ Look: Apple's own parts, plus a custom player look in the player windows only (d
 - Inner radius = outer radius - inset.
 
 ## Layout.swift
-- Fixed sizes: player 320 x 148, equalizer 320 wide, windowshade 24 tall, snap distance 8, sidebar 180-220, popover 280 wide.
+- Fixed sizes: player 384 x 148, equalizer 384 wide, windowshade 24 tall, snap distance 8, sidebar 180-220, popover 280 wide.
 
 ## Motion.swift
 - Every animation uses `Motion.*` through `.motionSafe(_:value:)`, so Reduce Motion turns it off.

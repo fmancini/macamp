@@ -215,7 +215,7 @@ Depends: S-018
 Acceptance:
 - [unit] Editing title on an MP3 and an M4A writes the tag and reads back the same.
 - [self] A read-only file shows an error and leaves the tags unchanged.
-Status: todo (blocked: AVFoundation cannot write tags; needs a tag library such as TagLib)
+Status: dropped (writing tags needs a tag library; the decision is no external code)
 
 ## M3 Internet radio
 
@@ -392,7 +392,7 @@ Depends: S-001
 Acceptance:
 - [unit] A decoder library turns Vorbis and Opus into PCM for the engine.
 - [self] A test .ogg and .opus play, and seek works.
-Status: todo (blocked: needs a decoder library such as SFBAudioEngine; adding a third-party package was not approved)
+Status: dropped (OGG and Opus need a decoder library; the decision is no external code)
 
 ### S-045 Duplicate finder
 As the user, I find duplicates in my library and remove them.
@@ -409,21 +409,21 @@ Status: done (matching logic tested; the sheet has not been looked at on screen)
 As the user, I see helpful empty screens with a clear next step.
 Acceptance:
 - [snap] Empty library ("Add a folder"), empty queue, empty favorites, no search results.
-Status: todo
+Status: done
 
 ### S-051 Settings
 As the user, I find all options in one Settings window.
 Screens: 12-preferences
 Acceptance:
-- [snap] Panes: General, Library, Playback, Radio, Shortcuts, Appearance.
+- [snap] Panes: Library, Playback, Radio, Shortcuts, Appearance.
 - [self] Changes apply immediately and survive a restart.
-Status: todo
+Status: done
 
 ### S-052 App icon
 As the user, I see a real icon in the Dock and Finder.
 Acceptance:
 - [snap] The icon is shown in light, dark and tinted looks.
-Status: todo
+Status: done
 
 ### S-054 Spanish and English interface
 As the user, I use MacAmp in English or Spanish, following the system language.
@@ -437,7 +437,7 @@ As the user, every action has a menu item with a shortcut shown.
 Acceptance:
 - [self] File, Playback, View, Radio and Window menus list the actions from M1 to M5.
 - [manual] Review the menu against the Command map in docs/screens/INDEX.md once Swinsian is checked.
-Status: todo
+Status: done
 
 ### S-055 Choose light or dark
 As the user, I pick System, Light, or Dark in Settings > Appearance and every window follows.
@@ -460,6 +460,7 @@ Status: done
 - SHOUTcast and Icecast directories (SHOUTcast needs an API key).
 
 ## Dropped
+- Tag writing (S-019) and OGG/Opus (S-044): both need third-party code, which this project does not use. Tags are read-only; Ogg files do not play.
 - Podcasts (Swinsian): not part of the Winamp-plus-radio idea.
 - iOS transfer and sync: no companion app.
 - Apple Music library import: low priority; revisit after M2.

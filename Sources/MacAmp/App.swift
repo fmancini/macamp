@@ -120,6 +120,15 @@ struct MacAmpApp: App {
             Button("Repeat: \(player.queue.repeatMode.label)") { player.cycleRepeat() }
                 .keyboardShortcut("r")
         }
+        CommandMenu("Radio") {
+            Button("Browse Stations") { model.sidebar = .radio; openWindow(id: "library") }
+            Button("Favorites") { model.sidebar = .favorites; openWindow(id: "library") }
+            Button("History") { model.sidebar = .history; openWindow(id: "library") }
+            Divider()
+            Button(player.isRecording ? "Stop Recording" : "Record Station") { player.toggleRecording() }
+                .disabled(!player.canRecord && !player.isRecording)
+            Button("Show Recordings in Finder") { NSWorkspace.shared.open(Player.recordingsFolder) }
+        }
         CommandGroup(after: .windowArrangement) {
             Button("Show Library") { model.sidebar = .library; openWindow(id: "library") }
                 .keyboardShortcut("1")

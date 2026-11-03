@@ -36,3 +36,8 @@ None is Strong. Do the `TrackMetadata` extraction inside S-010, and settle the Q
 - Moving `Store` into its own file: 40 lines, no pain.
 - Making the player a protocol for tests: one conformer, no second adapter yet.
 - Splitting `AppearanceSettings.swift` (183 lines): it is a Settings page and sits with its feature.
+
+## End of M6 update
+- `Player.swift` passed 600 lines after M5 (661). Moved Now Playing, media keys, artwork, and ReplayGain into `Player+NowPlaying.swift` (565 lines left, no behavior change; 59 self-test checks and 37 unit tests pass before and after).
+- Still open: the `AudioSource` seam (file, stream). Radio lives in `Player+Radio.swift`; extract it only when a third source appears.
+- The Library window's `LibraryPage` (about 250 lines) is the largest view; fine for now.
