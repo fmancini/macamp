@@ -30,6 +30,13 @@ struct MacAmpApp: App {
         .defaultLaunchBehavior(.presented)
         .commands { commands }
 
+        Window("Equalizer", id: "equalizer") {
+            EqualizerView()
+                .environment(player)
+                .themed()
+        }
+        .windowResizability(.contentSize)
+
         Window("Library", id: "library") {
             LibraryWindow()
                 .environment(model)
@@ -108,6 +115,8 @@ struct MacAmpApp: App {
                 .keyboardShortcut("1")
             Button("Show Queue") { model.sidebar = .queue; openWindow(id: "library") }
                 .keyboardShortcut("l")
+            Button("Show Equalizer") { openWindow(id: "equalizer") }
+                .keyboardShortcut("e")
             Button("Show Radio") { model.sidebar = .radio; openWindow(id: "library") }
                 .keyboardShortcut("2")
             Button("Show Player") { openWindow(id: "main") }

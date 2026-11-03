@@ -48,6 +48,8 @@ final class Player {
 
     let engine = AVAudioEngine()
     let node = AVAudioPlayerNode()
+    let equalizer = EqualizerModel()
+    let spectrum = SpectrumAnalyzer()
     var file: AVAudioFile?
     private var nextFile: AVAudioFile?
     var connectedFormat: AVAudioFormat?
@@ -62,6 +64,7 @@ final class Player {
         let saved = Store.defaults.object(forKey: "player.volume") as? Float
         volume = saved ?? 0.8
         engine.attach(node)
+        engine.attach(equalizer.unit)
         engine.mainMixerNode.outputVolume = Store.isOverridden ? 0 : volume
         if let restored = QueueStore.load(from: Store.queueURL) {
             queue = restored
@@ -69,6 +72,7 @@ final class Player {
         }
         // Samples leaving the player node, before the volume. Self-test reads it.
         Self.installPeakTap(on: node, store: peakStore)
+        Self.installSpectrumTap(on: equalizer.unit, analyzer: spectrum)
         // A device change (a display with speakers, headphones, Bluetooth) stops the
         // engine. Without this, the window says "playing" and nothing sounds.
         NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine,
@@ -87,6 +91,10 @@ final class Player {
     private let peakStore = PeakStore()
 
     /// Runs on the audio thread, so it must not be main-actor code.
+    private nonisolated static func installSpectrumTap(on unit: AVAudioUnitEQ, analyzer: SpectrumAnalyzer) {
+        unit.installTap(onBus: 0, bufferSize: 1024, format: nil) { buffer, _ in analyzer.process(buffer) }
+    }
+
     private nonisolated static func installPeakTap(on node: AVAudioPlayerNode, store: PeakStore) {
         node.installTap(onBus: 0, bufferSize: 1024, format: nil) { buffer, _ in
             guard let data = buffer.floatChannelData?[0] else { return }
@@ -418,7 +426,9 @@ final class Player {
         let running = engine.isRunning
         if running { engine.stop() }
         engine.disconnectNodeOutput(node)
-        engine.connect(node, to: engine.mainMixerNode, format: format)
+        engine.disconnectNodeOutput(equalizer.unit)
+        engine.connect(node, to: equalizer.unit, format: format)
+        engine.connect(equalizer.unit, to: engine.mainMixerNode, format: format)
         connectedFormat = format
     }
 

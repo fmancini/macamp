@@ -109,6 +109,25 @@ enum SelfTest {
             QueueStore.save(saved, to: dir.appending(path: "queue.json"))
             check("the Queue survives a save and load", QueueStore.load(from: dir.appending(path: "queue.json")) == saved)
 
+            // S-030 equalizer and S-031 spectrum, measured on a 440 Hz tone
+            let tone = sine(dir.appending(path: "tone.wav"), seconds: 8)
+            player.open([tone])
+            try? await Task.sleep(for: .seconds(0.8))
+            let loud = player.spectrum.bars.max() ?? 0
+            check("the spectrum shows the tone while playing", loud > 0.2, "max bar \(loud)")
+            player.equalizer.state.preamp = -12
+            try? await Task.sleep(for: .seconds(0.6))
+            let quiet = player.spectrum.bars.max() ?? 0
+            check("the preamp changes the sound", loud - quiet > 0.08, "\(loud) -> \(quiet)")
+            player.equalizer.state.enabled = false
+            try? await Task.sleep(for: .seconds(0.6))
+            check("turning the equalizer off restores it", (player.spectrum.bars.max() ?? 0) > quiet + 0.08)
+            player.equalizer.state.enabled = true
+            player.equalizer.state.apply(EqualizerPreset.all[1])
+            check("equalizer settings are saved", EqualizerModel().state == player.equalizer.state)
+            player.equalizer.state = EqualizerState()
+            player.clearQueue()
+
             // S-010 and S-011 Library folders
             let music = dir.appending(path: "Music/Album", directoryHint: .isDirectory)
             try? FileManager.default.createDirectory(at: music, withIntermediateDirectories: true)
@@ -209,6 +228,21 @@ enum SelfTest {
         let ok = player.radioNodeStarted && peak > 0.001
         player.stopRadio(clearStation: true)
         return ok
+    }
+
+    /// A 440 Hz tone, for tests.
+    private static func sine(_ url: URL, seconds: Double) -> URL {
+        let rate = 44_100.0
+        let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: rate, channels: 2, interleaved: false)!
+        let frames = AVAudioFrameCount(seconds * rate)
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames)!
+        buffer.frameLength = frames
+        for channel in 0..<2 {
+            let data = buffer.floatChannelData![channel]
+            for i in 0..<Int(frames) { data[i] = 0.5 * sinf(2 * .pi * 440 * Float(i) / Float(rate)) }
+        }
+        if let file = try? AVAudioFile(forWriting: url, settings: format.settings) { try? file.write(from: buffer) }
+        return url
     }
 
     /// A silent WAV, for tests.
