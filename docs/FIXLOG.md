@@ -45,3 +45,7 @@ Rule: every scene that uses `@Query` needs `.modelContainer(...)`; Settings is i
 ## Radio could queue audio without limit; playhead cost 19% CPU
 Symptom: playing a track used 20-30% CPU; a fast stream could grow memory. Cause: a 0.25 s TimelineView re-laid out the time label and seek bar; radio buffers were scheduled with no cap. Fix: 0.5 s playhead, 30 s cap on queued radio audio, http/https-only station URLs, mirror suffix check, undo and artwork cache limits, disk-space guard for recording (docs/SECURITY.md).
 Rule: Measure CPU with a bisect (env switches) before guessing, and give every queue that a network can fill a limit.
+
+## Equalizer drifted away from the player when dragging
+Symptom: dragging the player, the docked equalizer ended up offset or left behind. Cause: the system sets the dragged window from the mouse and ignores our snap correction, so the move delta applied to docked windows included the snap jump and errors added up. Fix: remember each docked window's offset at the start of the drag and place it from the dragged window's final position.
+Rule: Move a group from fixed offsets to the leader, never by accumulating deltas.

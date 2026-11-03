@@ -22,8 +22,8 @@ final class WindowSnapper {
     static let shared = WindowSnapper()
 
     private var windows: [NSWindow] = []
-    private var group: [NSWindow] = []
-    private var lastOrigin = NSPoint.zero
+    /// Windows that move with the dragged one, with their offset from it at the start of the drag.
+    private var group: [(window: NSWindow, offset: NSPoint)] = []
     private var adjusting = false
 
     func register(_ window: NSWindow) {
@@ -51,26 +51,26 @@ final class WindowSnapper {
     func window(titled title: String) -> NSWindow? { windows.first { $0.title == title } }
 
     private func willMove(_ window: NSWindow) {
-        lastOrigin = window.frame.origin
-        group = windows.filter { $0 !== window && $0.isVisible && WindowSnap.areDocked(window.frame, $0.frame) }
+        group = windows
+            .filter { $0 !== window && $0.isVisible && WindowSnap.areDocked(window.frame, $0.frame) }
+            .map { ($0, NSPoint(x: $0.frame.origin.x - window.frame.origin.x, y: $0.frame.origin.y - window.frame.origin.y)) }
     }
 
     private func didMove(_ window: NSWindow) {
         guard !adjusting else { return }
         adjusting = true
         defer { adjusting = false }
-        var delta = NSPoint(x: window.frame.origin.x - lastOrigin.x, y: window.frame.origin.y - lastOrigin.y)
         // Snap to a window that is not already moving with this one.
-        let others = windows.filter { $0 !== window && $0.isVisible && !group.contains($0) }.map(\.frame)
+        let moving = group.map(\.window)
+        let others = windows.filter { $0 !== window && $0.isVisible && !moving.contains($0) }.map(\.frame)
         let snap = WindowSnap.offset(for: window.frame, to: others, distance: Layout.snapDistance) // grid: ok
         if snap != .zero {
             window.setFrameOrigin(NSPoint(x: window.frame.origin.x + snap.x, y: window.frame.origin.y + snap.y))
-            delta.x += snap.x
-            delta.y += snap.y
         }
-        for docked in group {
-            docked.setFrameOrigin(NSPoint(x: docked.frame.origin.x + delta.x, y: docked.frame.origin.y + delta.y))
+        // The system places the dragged window from the mouse, ignoring our snap, so the
+        // others are placed from its final position: they never drift apart.
+        for (docked, offset) in group {
+            docked.setFrameOrigin(NSPoint(x: window.frame.origin.x + offset.x, y: window.frame.origin.y + offset.y))
         }
-        lastOrigin = window.frame.origin
     }
 }
