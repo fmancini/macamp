@@ -115,6 +115,23 @@ enum SelfTest {
             try? await Task.sleep(for: .seconds(0.8))
             let loud = player.spectrum.bars.max() ?? 0
             check("the spectrum shows the tone while playing", loud > 0.2, "max bar \(loud)")
+            // The bars must change at the display rate, not once per audio block (about 100 ms).
+            player.clearQueue()
+            player.open([noise(dir.appending(path: "noise.wav"), seconds: 8)])
+            try? await Task.sleep(for: .seconds(0.6))
+            var distinct = 0
+            var last = player.spectrum.bars
+            for _ in 0..<30 {
+                try? await Task.sleep(for: .milliseconds(17))
+                let now = player.spectrum.bars
+                if now != last { distinct += 1 }
+                last = now
+            }
+            print("  tap block: \(player.spectrum.lastBlockFrames) frames")
+            check("the spectrum updates on nearly every frame", distinct >= 24, "\(distinct) of 30 readings changed")
+            player.clearQueue()
+            player.open([tone])
+            try? await Task.sleep(for: .seconds(0.8))
             player.equalizer.state.preamp = -12
             try? await Task.sleep(for: .seconds(0.6))
             let quiet = player.spectrum.bars.max() ?? 0
@@ -241,6 +258,21 @@ enum SelfTest {
         let ok = player.radioNodeStarted && peak > 0.001
         player.stopRadio(clearStation: true)
         return ok
+    }
+
+    /// White noise, for tests.
+    private static func noise(_ url: URL, seconds: Double) -> URL {
+        let rate = 44_100.0
+        let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: rate, channels: 2, interleaved: false)!
+        let frames = AVAudioFrameCount(seconds * rate)
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames)!
+        buffer.frameLength = frames
+        for channel in 0..<2 {
+            let data = buffer.floatChannelData![channel]
+            for i in 0..<Int(frames) { data[i] = Float.random(in: -0.4...0.4) }
+        }
+        if let file = try? AVAudioFile(forWriting: url, settings: format.settings) { try? file.write(from: buffer) }
+        return url
     }
 
     /// A 440 Hz tone, for tests.

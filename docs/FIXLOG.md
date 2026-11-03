@@ -17,3 +17,9 @@ Symptom: SIGTRAP at launch with `_dispatch_assert_queue_fail`.
 Cause: tap closures written in a main-actor type run on the audio thread.
 Fix: install taps from `nonisolated` functions and share data through a `nonisolated` class with a lock.
 Rule: any closure Core Audio calls must be `nonisolated`.
+
+## The spectrum updated only about 10 times a second
+Symptom: the bars looked choppy even though the view drew at 60 fps.
+Cause: an `AVAudioEngine` tap delivers audio in blocks of about 100 ms (4800 frames), whatever `bufferSize` asks for. The FFT ran once per block.
+Fix: a pass-through `AUAudioUnit` (`SpectrumAudioUnit`) copies each render pass (about 470 frames) into a ring buffer; the FFT runs when the view draws. The self-test counts how many of 30 readings, 17 ms apart, change.
+Rule: for anything that must look live, do not use an engine tap; use a render-time unit or compute at draw time.

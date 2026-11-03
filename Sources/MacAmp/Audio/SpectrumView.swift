@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The live spectrum in the player display: 20 bars that rise at once and fall slowly.
+/// The live spectrum in the player display: 20 bars, drawn 60 times a second, that rise fast and fall slowly.
 struct SpectrumView: View {
     @Environment(Player.self) private var player
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -10,7 +10,7 @@ struct SpectrumView: View {
 
     var body: some View {
         let live = player.isPlaying && !reduceMotion && player.avPlayer == nil
-        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !live)) { _ in
+        TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !live)) { _ in
             Canvas { context, size in
                 let source: [Float]
                 if ProcessInfo.processInfo.environment["APP_SNAPSHOT"] != nil {
@@ -38,7 +38,7 @@ struct SpectrumView: View {
 
         func update(_ new: [Float]) -> [Float] {
             for i in 0..<min(new.count, levels.count) {
-                levels[i] = new[i] > levels[i] ? new[i] : max(new[i], levels[i] - 0.06)
+                levels[i] = new[i] > levels[i] ? levels[i] + (new[i] - levels[i]) * 0.7 : max(new[i], levels[i] - 0.03)
             }
             return levels
         }

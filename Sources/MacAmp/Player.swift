@@ -50,6 +50,8 @@ final class Player {
     let node = AVAudioPlayerNode()
     let equalizer = EqualizerModel()
     let spectrum = SpectrumAnalyzer()
+    /// Copies the audio into the spectrum at every render pass. nil until created.
+    var spectrumUnit: AVAudioUnit?
     var file: AVAudioFile?
     private var nextFile: AVAudioFile?
     var connectedFormat: AVAudioFormat?
@@ -72,7 +74,7 @@ final class Player {
         }
         // Samples leaving the player node, before the volume. Self-test reads it.
         Self.installPeakTap(on: node, store: peakStore)
-        Self.installSpectrumTap(on: equalizer.unit, analyzer: spectrum)
+        installSpectrumUnit()
         // A device change (a display with speakers, headphones, Bluetooth) stops the
         // engine. Without this, the window says "playing" and nothing sounds.
         NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine,
@@ -80,6 +82,20 @@ final class Player {
             MainActor.assumeIsolated { self?.engineConfigurationChanged() }
         }
         setUpRemoteCommands()
+    }
+
+    private func installSpectrumUnit() {
+        Task {
+            if let unit = await SpectrumAudioUnit.make(analyzer: spectrum) {
+                engine.attach(unit)
+                spectrumUnit = unit
+                // A graph already connected without the unit is rebuilt on the next play.
+                connectedFormat = nil
+            } else {
+                // Fall back to the engine tap (slower: blocks of 100 ms).
+                Self.installSpectrumTap(on: equalizer.unit, analyzer: spectrum)
+            }
+        }
     }
 
     /// Largest sample seen since the last read, then resets. Self-test only.
@@ -92,7 +108,7 @@ final class Player {
 
     /// Runs on the audio thread, so it must not be main-actor code.
     private nonisolated static func installSpectrumTap(on unit: AVAudioUnitEQ, analyzer: SpectrumAnalyzer) {
-        unit.installTap(onBus: 0, bufferSize: 1024, format: nil) { buffer, _ in analyzer.process(buffer) }
+        unit.installTap(onBus: 0, bufferSize: 512, format: nil) { buffer, time in analyzer.process(buffer, at: time) }
     }
 
     private nonisolated static func installPeakTap(on node: AVAudioPlayerNode, store: PeakStore) {
@@ -428,7 +444,15 @@ final class Player {
         engine.disconnectNodeOutput(node)
         engine.disconnectNodeOutput(equalizer.unit)
         engine.connect(node, to: equalizer.unit, format: format)
-        engine.connect(equalizer.unit, to: engine.mainMixerNode, format: format)
+        if let spectrumUnit {
+            engine.disconnectNodeOutput(spectrumUnit)
+            engine.connect(equalizer.unit, to: spectrumUnit, format: format)
+            engine.connect(spectrumUnit, to: engine.mainMixerNode, format: format)
+            spectrum.setRate(Float(format.sampleRate))
+            spectrum.setLatency(seconds: engine.outputNode.presentationLatency)
+        } else {
+            engine.connect(equalizer.unit, to: engine.mainMixerNode, format: format)
+        }
         connectedFormat = format
     }
 
