@@ -24,6 +24,7 @@ struct LibraryPage: View {
     @State private var album = ""
     @State private var showInspector = false
     @State private var showDuplicates = false
+    @State private var confirmMissing = false
     @SceneStorage("libraryColumns") private var columns: TableColumnCustomization<LibraryTrack>
 
     // MARK: Rows
@@ -42,6 +43,8 @@ struct LibraryPage: View {
         }
         return list.sorted(using: sortOrder)
     }
+
+    private var missingCount: Int { tracks.filter { !$0.isAvailable }.count }
 
     private var selectedTracks: [LibraryTrack] { rows.filter { selection.contains($0.persistentModelID) } }
 
@@ -75,6 +78,12 @@ struct LibraryPage: View {
         .navigationSubtitle(tracks.isEmpty ? "" : "\(rows.count) of \(tracks.count) tracks")
         .toolbar { toolbar }
         .sheet(isPresented: $showDuplicates) { DuplicatesSheet() }
+        .confirmationDialog("Remove \(missingCount) Missing Tracks?", isPresented: $confirmMissing) {
+            Button("Remove from Library", role: .destructive) { library.removeMissing(inFolder: folder) }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("These files are no longer on your Mac. Only the Library entries are removed.")
+        }
         .onChange(of: genre) { artist = ""; album = "" }
         .onChange(of: artist) { album = "" }
     }
@@ -137,6 +146,10 @@ struct LibraryPage: View {
                 }
             }
             Divider()
+            Button("Remove from Library") {
+                library.remove(rows.filter { ids.contains($0.persistentModelID) })
+                selection = []
+            }
             Button("Show in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting(rows.filter { ids.contains($0.persistentModelID) }.map(\.url))
             }
@@ -172,6 +185,11 @@ struct LibraryPage: View {
         ToolbarItem {
             Button("Add Folder\u{2026}", systemImage: "folder.badge.plus") { addFolder() }
                 .help("Add a music folder to the Library (\u{21E7}\u{2318}O)")
+        }
+        ToolbarItem {
+            Button("Remove Missing Tracks\u{2026}", systemImage: "trash.slash") { confirmMissing = true }
+                .help(missingCount == 0 ? "No tracks are missing" : "Remove the \(missingCount) tracks whose files were deleted")
+                .disabled(missingCount == 0)
         }
         ToolbarItem {
             Button("Find Duplicates\u{2026}", systemImage: "square.on.square") { showDuplicates = true }

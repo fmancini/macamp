@@ -49,6 +49,30 @@ final class LibraryModel {
         startWatching()
     }
 
+    /// Removes the Library entries whose files are gone from disk (files that
+    /// came back are revived first). Returns how many entries were removed.
+    @discardableResult
+    func removeMissing(inFolder folder: String? = nil) -> Int {
+        let all = (try? context.fetch(FetchDescriptor<LibraryTrack>())) ?? []
+        var removed = 0
+        for track in all where folder == nil || track.folderPath == folder {
+            if FileManager.default.fileExists(atPath: track.path) {
+                if !track.isAvailable { track.isAvailable = true }
+            } else {
+                context.delete(track)
+                removed += 1
+            }
+        }
+        try? context.save()
+        return removed
+    }
+
+    /// Removes entries from the Library. The files stay on disk.
+    func remove(_ tracks: [LibraryTrack]) {
+        for track in tracks { context.delete(track) }
+        try? context.save()
+    }
+
     func syncAll() async {
         for folder in folders { await sync(folder.path) }
     }

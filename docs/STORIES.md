@@ -453,6 +453,19 @@ UX:
 - Access: the control is keyboard operable; VoiceOver reads "Appearance, System".
 Status: done
 
+### S-056 Remove tracks whose files were deleted
+As the user, I remove the Library entries of files I deleted, or remove any selected tracks from the Library.
+Screens: library
+Acceptance:
+- [self] "Remove Missing Tracks" removes only entries whose files are gone, and files that came back are kept.
+- [unit] "Remove from Library" on a selection removes the entries and leaves the files on disk.
+- [snap] The toolbar button is disabled when nothing is missing.
+UX:
+- Flow: toolbar "Remove Missing Tracks…" -> confirmation "Remove N Missing Tracks?" -> Remove from Library / Cancel.
+- Surface: confirmation dialog (a bulk action); the context menu item acts at once because the files are not touched.
+- Words: "Remove Missing Tracks…", "Remove from Library"; the dialog says only the entries are removed.
+Status: done
+
 ## Later
 - Smart playlists (09-smart-playlist-editor), art grid (03-art-grid), find and replace (06-find-replace), separate playlist windows.
 - Skin support for .wsz and plug-in visualizations such as MilkDrop.

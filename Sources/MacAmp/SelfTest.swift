@@ -173,6 +173,14 @@ enum SelfTest {
             }
             check("a new file in a watched folder appears on its own", library.trackCount == 4, "count \(library.trackCount) after \(waited) s")
 
+            // Missing tracks can be removed from the Library
+            let missingBefore = library.trackCount
+            check("a deleted file still has its entry until it is removed", ((try? library.context.fetch(FetchDescriptor<LibraryTrack>())) ?? []).filter { !$0.isAvailable }.count == 1)
+            let removedCount = library.removeMissing()
+            check("Remove Missing Tracks removes only the deleted files", removedCount == 1 && library.trackCount == missingBefore - 1,
+                  "removed \(removedCount), \(missingBefore) -> \(library.trackCount)")
+            check("no missing tracks are left", ((try? library.context.fetch(FetchDescriptor<LibraryTrack>())) ?? []).allSatisfy(\.isAvailable))
+
             // S-015, S-016, S-017 playlists
             let roadTrip = library.createPlaylist(name: "  Road   trip ", items: player.queue.tracks.map(\.path))
             check("a playlist is roadTrip from the Queue", roadTrip.name == "Road trip" && roadTrip.items.count == player.queue.tracks.count)
