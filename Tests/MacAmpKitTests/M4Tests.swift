@@ -108,3 +108,23 @@ import Testing
     #expect(ReplayGain.volume(gain: nil) == 1)
     #expect(ReplayGain.volume(gain: -1, peak: 1.5) < 0.9)
 }
+
+@Test func helpDocumentSplitsTopicsAndBlocks() {
+    let text = """
+    # Help
+
+    ## First
+    One paragraph
+    over two lines.
+
+    - A bullet
+    1. A step
+
+    ## Second
+    Text with **bold**.
+    """
+    let topics = HelpDocument.parse(text)
+    #expect(topics.map(\.title) == ["First", "Second"])
+    #expect(topics[0].blocks == [.paragraph("One paragraph over two lines."), .bullet("A bullet"), .step(1, "A step")])
+    #expect(topics[1].plainText == "Text with **bold**.")
+}

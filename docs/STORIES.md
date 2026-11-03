@@ -466,6 +466,19 @@ UX:
 - Words: "Remove Missing Tracks…", "Remove from Library"; the dialog says only the entries are removed.
 Status: done
 
+### S-057 Help
+As the user, I open Help from the Help menu (⌘?) and read how to use MacAmp, in my language.
+Screens: help
+Acceptance:
+- [self] The Help has the same topics in English and Spanish, and every topic has text.
+- [snap] A window with a topic list, a search field, and the text of the selected topic.
+- [unit] The help text is split into topics, bullets, and numbered steps.
+UX:
+- Flow: Help > MacAmp Help (⌘?) -> window with topics -> pick a topic or type in the search field.
+- Surface: a window (long reference text people keep open beside the app).
+- Words: "MacAmp Help", "Search Help"; the text lives in `Localization/<lang>.lproj/Help.md`.
+Status: done
+
 ## Later
 - Smart playlists (09-smart-playlist-editor), art grid (03-art-grid), find and replace (06-find-replace), separate playlist windows.
 - Skin support for .wsz and plug-in visualizations such as MilkDrop.

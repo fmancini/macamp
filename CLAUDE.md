@@ -59,3 +59,4 @@ The bama plugin has a skill for each step: `mac-design` (design rules),
 - Text from a `String` variable is not translated by SwiftUI. Use `String(localized: "...")`, or `Text("...")`, `Button("...")`, `.help("...")` with a literal. For a choice between two texts use `cond ? Text("a") : Text("b")`.
 - After adding or changing a text, run `python3 tools/strings.py`: it lists texts without a Spanish translation and exits 1.
 - Check a language: `APP_STORE=/tmp/x.store APP_SEED=1 APP_SNAPSHOT=/tmp/shots ~/Applications/MacAmp.app/Contents/MacOS/MacAmp -AppleLanguages "(es)"`.
+- The Help text is `Localization/<lang>.lproj/Help.md` (English and Spanish). When a feature or shortcut changes, update both files.

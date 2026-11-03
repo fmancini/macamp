@@ -79,6 +79,15 @@ enum Snapshot {
                 }
                 player.equalizer.state = EqualizerState()
             }
+            // The Help window.
+            if only?.contains("player") ?? true {
+                for mode in ["light", "dark"] {
+                    NSApp.appearance = NSAppearance(named: mode == "light" ? .aqua : .darkAqua)
+                    openWindow(id: "help")
+                    try? await Task.sleep(for: .seconds(1))
+                    capture(to: "\(dir)/help-\(mode).png", window: NSApp.windows.first { $0.title == String(localized: "MacAmp Help") || $0.isVisible && $0.frame.width > 700 && $0.title != "MacAmp" && !SidebarItem.allCases.map(\.title).contains($0.title) })
+                }
+            }
             // The About panel with the credits.
             if only?.contains("player") ?? true {
                 NSApp.orderFrontStandardAboutPanel(nil)

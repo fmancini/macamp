@@ -114,6 +114,7 @@
 "Looking for duplicates…" = "Buscando duplicados…";
 "M3U Playlist…" = "Lista M3U…";
 "Mac" = "Mac";
+"MacAmp Help" = "Ayuda de MacAmp";
 "MacAmp History" = "Historial de MacAmp";
 "MacAmp found no audio files here." = "MacAmp no encontró archivos de audio aquí.";
 "Mint" = "Menta";
@@ -218,6 +219,7 @@
 "Scanning %lld of %lld" = "Analizando %lld de %lld";
 "Scanning…" = "Analizando…";
 "Search %@" = "Buscar por %@";
+"Search Help" = "Buscar en la ayuda";
 "Search Library" = "Buscar en la biblioteca";
 "Search by" = "Buscar por";
 "Seek Back 5 Seconds" = "Retroceder 5 segundos";

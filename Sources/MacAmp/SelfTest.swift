@@ -306,6 +306,17 @@ enum SelfTest {
                 check("the Spanish strings are in the app", false, "no es.lproj in the app bundle")
             }
 
+            // Help
+            func helpTopics(_ lang: String) -> [HelpDocument.Topic] {
+                guard let path = Bundle.main.path(forResource: "Help", ofType: "md", inDirectory: nil, forLocalization: lang),
+                      let text = try? String(contentsOfFile: path, encoding: .utf8) else { return [] }
+                return HelpDocument.parse(text)
+            }
+            let helpEnglish = helpTopics("en"), helpSpanish = helpTopics("es")
+            check("the help has the same topics in English and Spanish", helpEnglish.count >= 10 && helpEnglish.count == helpSpanish.count,
+                  "en \(helpEnglish.count), es \(helpSpanish.count)")
+            check("every help topic has text", (helpEnglish + helpSpanish).allSatisfy { !$0.blocks.isEmpty })
+
             // S-055 light and dark
             AppearanceStore.shared.mode = .dark
             check("Dark mode applies to the app", NSApp.appearance?.name == .darkAqua)

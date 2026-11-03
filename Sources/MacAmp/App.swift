@@ -38,6 +38,12 @@ struct MacAmpApp: App {
         }
         .windowResizability(.contentSize)
 
+        Window("MacAmp Help", id: "help") {
+            HelpView()
+                .themed()
+        }
+        .defaultSize(width: 820, height: 560)
+
         Window("Library", id: "library") {
             LibraryWindow()
                 .environment(model)
@@ -126,6 +132,10 @@ struct MacAmpApp: App {
                 .keyboardShortcut("s")
             Button("Repeat: \(player.queue.repeatMode.label)") { player.cycleRepeat() }
                 .keyboardShortcut("r")
+        }
+        CommandGroup(replacing: .help) {
+            Button("MacAmp Help") { openWindow(id: "help") }
+                .keyboardShortcut("?", modifiers: .command)
         }
         CommandMenu("Radio") {
             Button("Browse Stations") { model.sidebar = .radio; openWindow(id: "library") }
