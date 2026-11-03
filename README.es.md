@@ -103,4 +103,6 @@ El self-test reproduce audio real (con la salida silenciada) y, si hay conexión
 
 Creado por Felipe Mancini ([@fmancinirt](https://x.com/fmancinirt) en X). Directorio de emisoras de la comunidad de Radio Browser. Inspirada en Winamp. MacAmp no está afiliada a Winamp.
 
-Licencia: aún no elegida.
+## Licencia
+
+MacAmp se publica bajo la [licencia BSD de 3 cláusulas](LICENSE). La lista de emisoras viene del servicio Radio Browser, que tiene sus propios términos; las transmisiones pertenecen a sus emisoras.

@@ -101,4 +101,6 @@ The self-test plays real audio (with the output muted) and, when it is online, r
 
 Created by Felipe Mancini ([@fmancinirt](https://x.com/fmancinirt) on X). Station directory by the Radio Browser community. Inspired by Winamp. MacAmp is not affiliated with Winamp.
 
-Licence: not chosen yet.
+## Licence
+
+MacAmp is released under the [BSD 3-Clause License](LICENSE). The station list comes from the Radio Browser service, which has its own terms; the radio streams belong to their stations.
