@@ -84,6 +84,7 @@ struct LibraryWindow: View {
             }
         }
         .onAppear { player.undoManager = undoManager }
+        .background(WindowAccessor { WindowSnapper.shared.register($0) })
         .alert(naming?.renaming == nil ? LocalizedStringKey("New Playlist") : LocalizedStringKey("Rename Playlist"), isPresented: Binding(
             get: { naming != nil }, set: { if !$0 { naming = nil } })) {
             TextField("Name", text: $name)

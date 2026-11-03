@@ -65,7 +65,7 @@ MacAmp finds stations in the free Radio Browser directory (radio-browser.info).
 - The spectrum in the Player display moves with the music. With Reduce Motion on, it stays still.
 
 ## Player Windows
-- The Player, the equalizer, and the Library are separate windows. The Player and the equalizer snap to each other when you drag them close, and move together while they touch.
+- The Player, the equalizer, and the Library are separate windows. The Player, the equalizer, and the Library snap to each other when you drag them close, and move together while they touch. Drag the left or right edge of the Player to make it wider; a docked equalizer follows its width.
 - Press ⌥⌘M (or the small button on the display) to shrink the Player to a thin bar. Press it again to bring it back.
 - The menu bar item shows what is playing and has transport buttons and a volume slider. Turn it on or off in Settings > Appearance.
 - Settings > Appearance also sets light or dark mode, the Player theme (Classic or Mac), the accent color, and the language.

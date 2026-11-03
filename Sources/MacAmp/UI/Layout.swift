@@ -4,6 +4,8 @@ import CoreGraphics
 enum Layout {
     /// Main player window width and height.
     static let playerWidth: CGFloat = 384
+    /// Widest the player and equalizer can be dragged.
+    static let maxPlayerWidth: CGFloat = 960
     static let playerHeight: CGFloat = 148
     /// Equalizer window width; the queue window matches the player width.
     static let equalizerWidth: CGFloat = 384

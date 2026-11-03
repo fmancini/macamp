@@ -47,7 +47,8 @@ struct EqualizerView: View {
             }
         }
         .padding(Space.md)
-        .frame(width: Layout.equalizerWidth)
+        .fixedSize(horizontal: false, vertical: true) // height follows the content; only the width is free
+        .frame(minWidth: Layout.equalizerWidth, maxWidth: Layout.maxPlayerWidth)
         .background(Surface.playerBody)
         .noInitialFocus()
         .background(WindowAccessor { window in

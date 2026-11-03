@@ -27,7 +27,8 @@ struct PlayerView: View {
             }
         }
         .padding(windowState.shade ? Space.sm : Space.md)
-        .frame(width: Layout.playerWidth)
+        .fixedSize(horizontal: false, vertical: true) // height follows the content; only the width is free
+        .frame(minWidth: Layout.playerWidth, maxWidth: Layout.maxPlayerWidth)
         .background(Surface.playerBody)
         .noInitialFocus()
         .dropDestination(for: URL.self) { urls, _ in

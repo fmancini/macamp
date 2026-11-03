@@ -40,6 +40,9 @@ final class WindowSnapper {
         center.addObserver(forName: NSWindow.didMoveNotification, object: window, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { if let w = box.value { self?.didMove(w) } }
         }
+        center.addObserver(forName: NSWindow.didResizeNotification, object: window, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { if let w = box.value { self?.didResize(w) } }
+        }
         center.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { if let w = box.value { self?.windows.removeAll { $0 === w } } }
         }
@@ -52,6 +55,21 @@ final class WindowSnapper {
     }
 
     func window(titled title: String) -> NSWindow? { windows.first { $0.title == title } }
+
+    /// Resizing the player or the equalizer gives the other the same width while they are stacked.
+    private func didResize(_ window: NSWindow) {
+        guard !adjusting, window.title == "MacAmp" || window.title == "Equalizer" else { return }
+        let partnerTitle = window.title == "MacAmp" ? "Equalizer" : "MacAmp"
+        guard let partner = self.window(titled: partnerTitle), partner.isVisible,
+              abs(partner.frame.minX - window.frame.minX) <= 1,
+              abs(partner.frame.maxY - window.frame.minY) <= 1 || abs(window.frame.maxY - partner.frame.minY) <= 1,
+              abs(partner.frame.width - window.frame.width) > 0.5 else { return }
+        adjusting = true
+        defer { adjusting = false }
+        var frame = partner.frame
+        frame.size.width = window.frame.width
+        partner.setFrame(frame, display: true)
+    }
 
     private func willMove(_ window: NSWindow) {
         endDrag()

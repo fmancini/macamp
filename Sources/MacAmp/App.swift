@@ -27,7 +27,8 @@ struct MacAmpApp: App {
                 .themed()
                 .overlay { if GridOverlay.enabled { GridOverlay() } }
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: Layout.playerWidth, height: Layout.playerHeight)
         .defaultLaunchBehavior(.presented)
         .commands { commands }
 
@@ -36,7 +37,8 @@ struct MacAmpApp: App {
                 .environment(player)
                 .themed()
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: Layout.equalizerWidth, height: 200)
 
         Window("MacAmp Help", id: "help") {
             HelpView()

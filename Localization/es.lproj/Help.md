@@ -65,7 +65,7 @@ MacAmp encuentra emisoras en el directorio gratuito Radio Browser (radio-browser
 - El espectro de la pantalla del Reproductor se mueve con la música. Con Reducir movimiento activado, se queda quieto.
 
 ## Ventanas del reproductor
-- El Reproductor, el ecualizador y la Biblioteca son ventanas separadas. El Reproductor y el ecualizador se pegan entre sí cuando los arrastras cerca, y se mueven juntos mientras se tocan.
+- El Reproductor, el ecualizador y la Biblioteca son ventanas separadas. El Reproductor, el ecualizador y la Biblioteca se pegan entre sí cuando los arrastras cerca, y se mueven juntos mientras se tocan. Arrastra el borde izquierdo o derecho del Reproductor para ensancharlo; un ecualizador pegado sigue su ancho.
 - Pulsa ⌥⌘M (o el botón pequeño de la pantalla) para reducir el Reproductor a una barra delgada. Púlsalo otra vez para volver.
 - El ítem de la barra de menús muestra lo que suena y tiene botones de control y un deslizador de volumen. Actívalo o desactívalo en Ajustes > Apariencia.
 - Ajustes > Apariencia también define el modo claro u oscuro, el tema del Reproductor (Clásico o Mac), el color de énfasis y el idioma.
